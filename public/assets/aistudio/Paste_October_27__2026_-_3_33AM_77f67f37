@@ -1,0 +1,795 @@
+BttM — COMPLETE APP REBUILD, MUSIC ENGINE REPLACEMENT & PREMIUM iOS REDESIGN
+
+Act as a senior iOS product designer, React/TypeScript architect, audio-engine specialist, and frontend performance engineer.
+
+You are working on my existing application, BttM, a mobile-first music player built with React and TypeScript.
+
+Your task is to upgrade the existing application into a beautiful, premium, animated music player inspired by Apple’s Liquid Glass design language.
+
+This is a modification of my existing application, not a request to create a separate demo.
+
+Inspect the existing codebase first. Understand its architecture, audio engine, playlist-import logic, storage implementation, and current components before changing anything. Preserve working functionality while replacing the broken or unwanted implementations.
+
+Do not give me a plan and stop. Implement the changes in the available project.
+
+I develop using an iPhone, so prioritize a solution that can be developed, tested, and maintained through Google AI Studio without requiring me to operate a local computer.
+
+⸻
+
+1. COMPLETE REBRANDING
+
+Remove the application’s existing basic visual identity.
+
+Rebrand the entire application as:
+
+BttM — by Ahmed Taboubi
+
+The brand must feel like a premium, futuristic music application rather than a generic web music player.
+
+Logo
+
+Use the logo shown in my provided reference picture.
+
+* Preserve the recognizable design of the reference.
+* Adapt it into a polished app icon.
+* Create a visually coherent version for the player, loading screens, and branding.
+* Do not substitute an unrelated generic music icon.
+* If the reference image is unavailable in the project context, ask me to provide it rather than inventing a replacement.
+
+Branding placement
+
+Display a small, elegant:
+
+bttm By Ahmed Taboubi
+
+in the upper branding area and footer.
+
+Keep the branding discreet. The music, artwork, and player controls must remain the visual focus.
+
+Do not allow branding to consume valuable screen space.
+
+Remove unwanted integrations
+
+* Completely remove Anghami and its related UI, configuration, dependencies, and unused code.
+* Replace the Anghami integration with SoundCloud where a documented, permitted integration is available.
+* Remove obsolete provider settings and dead components.
+* Preserve existing user music, playlists, and locally stored files whenever possible.
+* Do not delete user data during migrations or redesigns.
+
+⸻
+
+2. ORIGINAL COLOR PALETTE — NO WHITE
+
+Create a distinctive, sophisticated color system.
+
+Pure white must never be used as a background or major interface color. Black is reserved for dark mode.
+
+Use a warm, elegant light theme and a deep, cinematic dark theme.
+
+Light mode
+
+Suggested palette:
+
+* Background: warm champagne #F3EBDD
+* Elevated surfaces: pale sand #E8DDC9
+* Primary accent: electric chartreuse #C8F169
+* Secondary accent: deep teal #176B67
+* Text: dark espresso #292820
+* Muted text: warm gray #777267
+* Glass borders: subtle translucent olive and champagne tones
+
+Dark mode
+
+Suggested palette:
+
+* Background: near-black #080A09
+* Elevated surfaces: #141815
+* Primary accent: luminous chartreuse #C8F169
+* Secondary accent: turquoise #62D8C8
+* Primary text: soft ivory #E8E9DD
+* Muted text: #92998F
+* Glass borders: translucent gray-green
+
+These colors are starting points. Refine their relationships to achieve a coherent, original identity.
+
+Palette rules
+
+1. Never use pure white as the main background.
+2. Use black and near-black backgrounds exclusively for dark mode.
+3. Avoid generic purple-and-blue AI gradients.
+4. Avoid excessive neon effects.
+5. Keep text readable against translucent surfaces.
+6. Apply color consistently to buttons, menus, sliders, animations, artwork overlays, and player controls.
+7. Ensure both themes feel intentionally designed, not like simple color inversions.
+
+Persist the user’s theme preference.
+
+⸻
+
+3. LIQUID GLASS DESIGN SYSTEM
+
+Redesign the entire application around an original interpretation of Apple’s Liquid Glass interface.
+
+Do not merely add blur to the existing design.
+
+Create a unified visual system with:
+
+* Floating translucent navigation.
+* Layered glass surfaces.
+* Background blur and controlled transparency.
+* Thin, subtle borders.
+* Soft, realistic shadows.
+* Depth between foreground controls and background artwork.
+* Rounded, floating panels.
+* Fluid transitions between interface states.
+* Subtle light reflections where supported.
+* Responsive animations that remain smooth on older iPhones.
+
+Floating navigation
+
+Create a floating, pill-shaped bottom navigation bar.
+
+Use four primary destinations:
+
+1. Home
+2. Search
+3. Library
+4. Player
+
+Adapt the navigation to the existing application structure if equivalent screens already exist.
+
+The navigation bar should appear to float above the interface rather than being attached to the bottom edge.
+
+Requirements:
+
+* Translucent background.
+* Rounded pill geometry.
+* Smooth active-item transitions.
+* Animated selection indicator.
+* Subtle press feedback.
+* Safe-area awareness.
+* No content hidden behind the navigation bar.
+* No abrupt layout jumps when switching tabs.
+
+On mobile, make the interface feel native, even though it is a web application.
+
+Use progressive enhancement for advanced visual effects. If a browser does not support a particular effect, provide a visually consistent fallback.
+
+Respect the user’s reduced-motion preference.
+
+⸻
+
+4. THE MUSIC PLAYER IS THE MAIN PRODUCT
+
+The player must receive the greatest amount of design and engineering attention.
+
+Do not treat it as a small component inside a generic application.
+
+It should feel like a premium, immersive music player.
+
+Main player screen
+
+Build an elegant player featuring:
+
+* Large album artwork.
+* Rounded artwork corners.
+* Smooth artwork transitions.
+* Song title and artist.
+* Playback progress.
+* Elapsed time and remaining duration.
+* Play and pause.
+* Previous and next.
+* Shuffle.
+* Repeat.
+* Queue management.
+* Volume adjustment.
+* Audio booster control.
+* Playlist access.
+* Track source information where relevant.
+
+Use responsive layouts that work on small iPhones.
+
+Avoid overcrowding the screen.
+
+Artwork should dominate the main player view, with controls arranged according to their importance.
+
+Animated artwork
+
+When a track changes:
+
+* Transition smoothly between artworks.
+* Avoid flashing or blank artwork.
+* Preserve the current layout.
+* Use subtle scale, opacity, or depth transitions.
+
+When music is playing, introduce a restrained visual response to playback.
+
+Do not run expensive continuous animations unnecessarily.
+
+⸻
+
+5. CREATE A FLOATING CIRCULAR VOLUME AND BOOSTER CONTROL
+
+This is a signature feature of BttM.
+
+Replace the conventional always-visible collection of secondary audio controls with one elegant, floating circular control positioned near the center of the lower player area.
+
+It should look like a sophisticated physical audio dial rendered in Liquid Glass.
+
+Collapsed state
+
+Display one circular floating control.
+
+Its visual structure contains two independently understandable sections:
+
+Upper semicircle: Volume
+
+The upper half of the circle represents the current volume level.
+
+* Animate the volume indicator as the value changes.
+* Display the current percentage when appropriate.
+* Make the indicator readable against both themes.
+
+Lower semicircle: Booster
+
+The lower half represents the audio-booster level.
+
+* Use a separate visual indicator.
+* Distinguish booster intensity from normal volume.
+* Display the booster percentage or level when expanded.
+
+Both indicators must accurately reflect the actual application state.
+
+Do not simulate audio levels that are not connected to real controls.
+
+Interaction
+
+When the user taps the floating circle:
+
+1. The circle performs a brief, elegant expansion animation.
+2. The volume and booster controls emerge from the circle.
+3. The normal audio-control menu appears inside the player interface.
+4. Sliders and buttons become interactive.
+5. The player artwork and primary playback controls remain visible.
+6. The expanded interface feels integrated with the player, not like a separate settings page.
+
+When the user finishes interacting or taps outside the menu:
+
+1. The controls collapse smoothly.
+2. The circle returns to its original position.
+3. The interface returns to its clean, minimal state.
+
+Do not collapse the menu immediately when the user is actively dragging a slider.
+
+Support touch input, pointer input, and keyboard accessibility where applicable.
+
+Important audio distinction
+
+Normal volume and audio boosting are not the same thing.
+
+Implement actual volume control using the existing audio engine.
+
+Implement boosting only if the current audio architecture supports a real gain-processing stage.
+
+If Web Audio API processing is required, use it appropriately and handle browser restrictions.
+
+Prevent clipping and excessive gain where possible.
+
+If boosting is unavailable, display a clear unavailable state instead of presenting a fake functional slider.
+
+Preserve playback when expanding or collapsing the control.
+
+⸻
+
+6. BACKGROUND PLAYBACK — CRITICAL REQUIREMENT
+
+Music must continue playing when the user:
+
+* Locks the iPhone.
+* Turns off the screen.
+* Switches to another application.
+* Returns to the Home Screen.
+* Opens another browser tab when the platform permits it.
+
+Investigate the existing playback implementation and fix the actual cause of playback stopping.
+
+Do not merely change the interface.
+
+Technical requirements
+
+1. Use a persistent HTML audio element or another suitable playback mechanism supported by the current architecture.
+2. Do not recreate the audio element every time React components rerender.
+3. Preserve playback across navigation and component unmounting.
+4. Keep the current track, position, volume, and queue in a stable playback manager.
+5. Use the Media Session API when supported.
+6. Provide media metadata, including title, artist, and artwork.
+7. Support operating-system media controls where available.
+8. Handle play, pause, previous, and next actions through media-session handlers when supported.
+9. Preserve the playback position during ordinary UI changes.
+10. Avoid unnecessary source reloads.
+11. Handle interrupted playback and recoverable audio errors.
+12. Prevent duplicate audio engines from playing simultaneously.
+13. Ensure playback remains functional when the screen is locked, subject to iOS and browser restrictions.
+
+iOS limitations
+
+Do not claim that a web application can guarantee uninterrupted background playback under every iOS condition.
+
+Implement the best-supported architecture and test it on the target browser.
+
+Identify any remaining platform limitations explicitly.
+
+Do not use fake keep-alive loops, artificial user interactions, or battery-draining workarounds.
+
+The essential objective is to prevent the application itself from unnecessarily stopping playback when the phone is locked or the user navigates away.
+
+⸻
+
+7. REPLACE X1 WITH A NO-USER-TOKEN METADATA PROVIDER
+
+Remove the existing X1 implementation if it depends on users supplying their own Telegram bot tokens or other unnecessary credentials.
+
+I want a straightforward import experience that does not require every user to create an API account.
+
+First inspect the existing implementation and determine what can actually be achieved without credentials.
+
+Preferred approach
+
+Investigate documented, unauthenticated metadata sources, such as Apple’s iTunes Search API:
+
+https://performance-partners.apple.com/search-api
+
+Verify the current documentation and restrictions before implementation.
+
+Use an available source to search for music metadata, including:
+
+* Track title.
+* Artist.
+* Album.
+* Artwork.
+* Duration, where available.
+* Recording identifiers, where available.
+
+If the source provides only individual track search rather than arbitrary playlist resolution, do not pretend that it supports playlist URLs.
+
+Provide a search interface where users can enter a song name, artist, or other supported query.
+
+If a user supplies a Spotify playlist URL, determine whether the playlist can be resolved through a documented, permitted mechanism that does not require exposing credentials in the frontend.
+
+If it cannot, explain the limitation and offer the supported manual import or search alternative.
+
+Do not invent an API endpoint.
+
+Do not assume that a public endpoint exists simply because a similar service has one.
+
+Do not require users to supply personal API tokens.
+
+Do not expose private credentials in the JavaScript bundle.
+
+SoundCloud
+
+Investigate the current official SoundCloud API and its authentication requirements.
+
+Official developer documentation:
+
+https://developers.soundcloud.com/docs/api/guide
+
+Integrate SoundCloud only to the extent supported by its current API, authentication rules, and permitted playback methods.
+
+Do not assume that every track is playable or downloadable.
+
+Where authentication or an authorized application configuration is required, explain that requirement and provide a clean unavailable state until the integration is configured.
+
+Do not scrape private endpoints or bypass access controls.
+
+⸻
+
+8. REPLACE X2 WITH YOUTUBE-BASED SONG SEARCH
+
+Remove the existing X2 implementation completely.
+
+Do not continue using the previous downloader, spotDL, or an architecture based on Telegram bots.
+
+The new X2 must be based on YouTube search.
+
+The user enters a song name and artist; the application searches YouTube and presents relevant results.
+
+Example input:
+
+Song Title — Artist Name
+
+The application should search for the closest matching recording and display results with:
+
+* Video or recording title.
+* Channel name.
+* Thumbnail.
+* Duration, where available.
+* Relevant artist and title information.
+* A way to preview or open the selected result using a supported playback method.
+
+Search behavior
+
+Implement a matching pipeline that:
+
+1. Normalizes the requested title and artist.
+2. Searches the configured, documented provider.
+3. Compares the requested song with returned result titles.
+4. Prefers exact title and artist matches.
+5. Uses duration as an additional signal when available.
+6. Rejects obviously unrelated results.
+7. Displays multiple candidates when the best match is uncertain.
+8. Lets the user select the correct result.
+9. Handles empty results, rate limits, unavailable videos, and network errors.
+10. Caches appropriate metadata when permitted.
+
+Do not select a random music video merely because it contains one matching word.
+
+Do not report a successful match without actual search results.
+
+YouTube API requirements
+
+Investigate the current official YouTube Data API documentation:
+
+https://developers.google.com/youtube/v3
+
+Determine which search features can be implemented without authentication and which require an API key or other configuration.
+
+Do not assume that YouTube offers an unrestricted, unauthenticated search endpoint.
+
+If a required credential is needed, keep it out of public frontend code. Explain the available deployment options and do not silently introduce a backend.
+
+Do not scrape undocumented endpoints or bypass platform restrictions.
+
+Playback and audio downloads
+
+Keep YouTube search separate from audio downloading.
+
+YouTube search results do not automatically grant permission to extract, download, or store their audio.
+
+Use supported playback mechanisms for YouTube content.
+
+For offline downloads, use only a source that explicitly permits downloading and storage for the intended use.
+
+If no authorized audio-download provider is available, the application must still provide a complete YouTube search and result-selection experience, while clearly indicating that offline audio import is unavailable for that source.
+
+Never create a fake download button that reports success without producing a valid audio file.
+
+Never save an HTML page, video webpage, or thumbnail with an audio filename.
+
+Never present YouTube search as a guaranteed source of downloadable audio.
+
+⸻
+
+9. IMPORTED MUSIC AND OFFLINE LIBRARY
+
+Preserve the application’s existing local music storage architecture whenever possible.
+
+Inspect it before implementing changes.
+
+The library should support:
+
+* Imported audio files.
+* Song metadata.
+* Album artwork.
+* Artist grouping.
+* Playlists.
+* Recently played tracks.
+* Favorites.
+* Playback history, if already supported.
+* Duplicate detection.
+* Missing-file handling.
+
+For every import, track the actual result.
+
+Possible statuses:
+
+* Ready to play.
+* Already in library.
+* Needs user selection.
+* Unsupported format.
+* Unavailable from source.
+* Download not permitted.
+* Network error.
+* Import failed.
+
+Only show a track as downloaded after the audio has actually been retrieved and saved successfully.
+
+If an import provider returns metadata without audio, mark the track as metadata-only rather than pretending it is available offline.
+
+Preserve playlist ordering.
+
+Do not erase the existing music library during an upgrade.
+
+⸻
+
+10. PREMIUM ANIMATIONS THROUGHOUT THE APPLICATION
+
+Redesign the complete animation system.
+
+The goal is a fluid, polished, interactive interface inspired by the movement and depth of iOS Liquid Glass.
+
+Implement appropriate animations for:
+
+* Opening the application.
+* Artwork transitions.
+* Expanding and collapsing the player.
+* Floating navigation.
+* Switching tabs.
+* Opening menus.
+* Selecting songs.
+* Adding tracks to playlists.
+* Expanding the volume and booster circle.
+* Changing volume.
+* Opening the queue.
+* Switching between light and dark mode.
+* Loading search results.
+* Showing import progress.
+* Displaying errors and success states.
+
+Motion principles
+
+Use short, intentional animations.
+
+Prefer smooth spring-like motion where practical.
+
+Use opacity, transforms, and other performant properties.
+
+Avoid excessive blur animations and continuous effects that drain battery.
+
+Do not animate every element independently without a coherent motion system.
+
+The interface should feel expensive and responsive, not noisy or childish.
+
+Use tactile feedback through visual motion rather than relying on sound effects.
+
+Respect reduced-motion preferences.
+
+⸻
+
+11. TYPOGRAPHY — REPLACE THE EXISTING FONTS
+
+Choose a new typography system that complements the brand.
+
+Do not keep the default-looking font choices if they make the interface feel generic.
+
+Use a refined sans-serif family, such as a carefully selected combination of:
+
+* Inter for general interface text.
+* A suitable system font stack for native-feeling controls.
+* A distinctive display face for selected headings, if it improves the design.
+
+Check licensing and availability before bundling external fonts.
+
+Prefer local or system fallbacks so the application remains usable offline.
+
+Typography hierarchy
+
+Define consistent styles for:
+
+* Main headings.
+* Song titles.
+* Artist names.
+* Secondary metadata.
+* Navigation labels.
+* Buttons.
+* Floating controls.
+* Percentages.
+* Import statuses.
+* Settings.
+
+Use expressive typography sparingly.
+
+Make track titles prominent, artist names quieter, and secondary metadata unobtrusive.
+
+Avoid excessively small text on iPhones.
+
+Ensure the application remains accessible when users increase system text size where supported.
+
+⸻
+
+12. RESPONSIVE DESIGN FOR IPHONE
+
+The primary target is an iPhone.
+
+Design for a narrow screen first, then adapt to larger screens.
+
+Requirements:
+
+* Correct iOS safe-area handling.
+* No content behind the status bar.
+* No controls obscured by the Home Indicator.
+* Touch targets large enough for comfortable use.
+* No accidental horizontal scrolling.
+* No clipped player controls.
+* No keyboard covering important search controls.
+* Smooth scrolling.
+* Correct portrait layout.
+* Graceful landscape behavior.
+* Stable layouts when artwork or metadata is missing.
+
+Do not make the design depend on hover interactions.
+
+Ensure every important action works with touch.
+
+Use the existing application’s supported browser targets rather than introducing unnecessary dependencies.
+
+⸻
+
+13. ENGINEERING REQUIREMENTS
+
+Before editing:
+
+1. Inspect the project structure.
+2. Identify the existing audio engine.
+3. Identify the current X1 and X2 implementations.
+4. Identify existing import, storage, and playlist components.
+5. Identify dependencies that are no longer needed.
+6. Identify any current bugs that would affect the new design.
+
+Then implement the changes incrementally.
+
+Architecture
+
+Keep the application modular.
+
+Separate:
+
+* Playback management.
+* Search providers.
+* Metadata normalization.
+* Import management.
+* Local library management.
+* Theme configuration.
+* Animation components.
+* User interface components.
+
+Use clear provider interfaces so future integrations can be added without rewriting the entire application.
+
+Do not add a backend merely to make an unavailable feature appear functional.
+
+Do not introduce unnecessary frameworks or large dependencies.
+
+Do not place secret API keys in frontend code.
+
+Do not hardcode successful responses or fake playlist contents.
+
+Do not create mock data that appears to be real imported music.
+
+If demonstration data is necessary during development, clearly isolate it from production behavior.
+
+Dependency management
+
+Remove obsolete dependencies only after checking their usage.
+
+Avoid breaking the existing application.
+
+Do not replace working storage with a less reliable implementation.
+
+Do not introduce paid services without explaining their costs and obtaining my approval.
+
+⸻
+
+14. REQUIRED TESTING
+
+Test the actual implementation rather than relying on visual inspection alone.
+
+Playback
+
+* Start a track.
+* Pause and resume.
+* Skip forward and backward.
+* Change tracks while playing.
+* Change volume.
+* Expand and collapse the circular audio control.
+* Confirm that the interface does not recreate the audio engine unnecessarily.
+* Test background playback on the supported iPhone browser.
+
+Search
+
+* Search for an exact song title.
+* Search using a title and artist.
+* Search using an incomplete title.
+* Search for a nonexistent song.
+* Verify that results correspond to the actual query.
+* Verify that API failures are displayed correctly.
+
+Import
+
+* Import supported audio.
+* Attempt a duplicate import.
+* Attempt an unsupported file.
+* Simulate a failed import.
+* Confirm that failed imports do not appear as successfully downloaded tracks.
+
+Interface
+
+* Test light mode.
+* Test dark mode.
+* Verify that the background palette follows the no-white rule.
+* Test the floating navigation.
+* Test the circular volume and booster menu.
+* Test small-screen layouts.
+* Test missing artwork.
+* Verify that animations do not prevent interaction.
+
+Do not claim that a test passed if it was not executed.
+
+Clearly distinguish between automated tests, manual tests, and behavior that still requires testing on a real iPhone.
+
+⸻
+
+15. IMPLEMENTATION PRIORITIES
+
+Work in this order:
+
+Priority 1 — Fix the audio engine
+
+Identify and fix unnecessary playback interruptions, especially during screen locking, navigation, and React rerenders.
+
+Priority 2 — Replace X1 and X2
+
+Remove token-dependent Telegram import logic, investigate genuinely accessible metadata sources, and replace X2 with YouTube-based song search.
+
+Priority 3 — Preserve the library
+
+Ensure the redesign does not destroy existing tracks, playlists, or storage.
+
+Priority 4 — Rebuild the player
+
+Implement the immersive player and the floating semicircular volume/booster control.
+
+Priority 5 — Redesign the entire interface
+
+Apply the new typography, original color system, Liquid Glass navigation, and coherent animations.
+
+Priority 6 — Test and clean up
+
+Resolve errors, remove obsolete integrations, verify provider behavior, and document remaining limitations.
+
+Do not sacrifice working playback to implement cosmetic effects.
+
+⸻
+
+16. FINAL DELIVERY
+
+When implementation is complete, provide a concise technical report covering:
+
+1. What was changed.
+2. Which components were replaced.
+3. How X1 now works.
+4. How YouTube-based X2 search works.
+5. Which integrations require credentials or external infrastructure.
+6. Which features work without a backend.
+7. Which features support actual offline audio.
+8. Whether background playback was tested and what limitations remain.
+9. Which dependencies were added or removed.
+10. Any remaining bugs or incomplete features.
+
+If a provider cannot be implemented in the available environment, explain precisely why and leave a clean, functional unavailable state.
+
+Do not claim that an unconfigured provider is operational.
+
+Do not claim that YouTube search produces downloadable audio automatically.
+
+Do not claim that background playback is guaranteed by every iOS browser.
+
+Do not stop after generating a visual mockup. Implement the real functionality that the current environment supports.
+
+FINAL PRODUCT VISION
+
+BttM should feel like a distinctive, premium music player designed specifically for people who love music.
+
+Its defining characteristics should be:
+
+* Original champagne-and-chartreuse light mode.
+* Cinematic near-black dark mode.
+* Liquid Glass floating navigation.
+* Immersive album artwork.
+* Fluid, carefully controlled animation.
+* A distinctive circular volume-and-booster interface.
+* Reliable playback management.
+* Straightforward music search.
+* Honest import and offline-storage behavior.
+* Minimal, elegant branding: bttm By Ahmed Taboubi.
+
+Make the design visually impressive, but keep the application fast, stable, usable, and honest about what its integrations can actually do.

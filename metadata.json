@@ -1,0 +1,8 @@
+{
+  "name": "Remix Remix MyMusic — Offline iPhone Music Player",
+  "description": "Personal offline music player for iPhone with Telegram music synchronization, persistent IndexedDB audio storage, playlist management, and lock-screen audio playback.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

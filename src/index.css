@@ -1,0 +1,249 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-btt-chartreuse: #C8F169;
+  --color-btt-teal: #176B67;
+  --color-btt-turquoise: #62D8C8;
+  --color-btt-champagne: #F3EBDD;
+  --color-btt-sand: #E8DDC9;
+  --color-btt-espresso: #292820;
+  --color-btt-warmgray: #777267;
+  --color-btt-darkbg: #080A09;
+  --color-btt-darkelevated: #141815;
+  --color-btt-ivory: #E8E9DD;
+  --color-btt-darkmuted: #92998F;
+}
+
+@layer base {
+  :root {
+    --sat: env(safe-area-inset-top, 0px);
+    --sab: env(safe-area-inset-bottom, 0px);
+    --sal: env(safe-area-inset-left, 0px);
+    --sar: env(safe-area-inset-right, 0px);
+    color-scheme: light dark;
+
+    /* Light Theme (Warm Champagne & Chartreuse) */
+    --btt-bg: #F3EBDD;
+    --btt-elevated: #E8DDC9;
+    --btt-accent: #C8F169;
+    --btt-secondary: #176B67;
+    --btt-text: #292820;
+    --btt-muted: #777267;
+    --btt-border: rgba(23, 107, 103, 0.12);
+  }
+
+  .dark {
+    /* Dark Theme (Cinematic Near-Black & Turquoise) */
+    --btt-bg: #080A09;
+    --btt-elevated: #141815;
+    --btt-accent: #C8F169;
+    --btt-secondary: #62D8C8;
+    --btt-text: #E8E9DD;
+    --btt-muted: #92998F;
+    --btt-border: rgba(200, 241, 105, 0.14);
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    box-sizing: border-box;
+  }
+
+  input, textarea {
+    -webkit-touch-callout: default;
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  html {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "SF Pro", -apple-system-subheadline, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-user-select: none;
+    overscroll-behavior-y: none;
+    min-height: 100%;
+    min-height: 100dvh;
+    min-height: -webkit-fill-available;
+  }
+
+  /* Black and White adaptive scrollbar */
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #d4d4d8;
+    border-radius: 9999px;
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background: #27272a;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #a1a1aa;
+  }
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: #3f3f46;
+  }
+}
+
+/* Standalone iPhone PWA Safe Area Utilities */
+/* Top Notch / Dynamic Island Safe Area */
+.pt-notch {
+  padding-top: max(calc(env(safe-area-inset-top, 0px) + 0.75rem), 1.25rem);
+}
+
+.pt-safe {
+  padding-top: max(env(safe-area-inset-top, 0px), 1rem);
+}
+
+/* Bottom Bar / Home Indicator Safe Area */
+.pb-home-indicator {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 0.5rem);
+}
+
+.pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 1rem);
+}
+
+.px-safe {
+  padding-left: max(env(safe-area-inset-left, 0px), 1rem);
+  padding-right: max(env(safe-area-inset-right, 0px), 1rem);
+}
+
+/* Btt Signature Letter Splitting Micro-Interaction */
+@keyframes bttSplitLeft {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) translateX(0px);
+  }
+  35% {
+    opacity: 1;
+    transform: scale(1.2) translateX(-9px) rotate(-8deg);
+  }
+  75% {
+    opacity: 1;
+    transform: scale(1.05) translateX(-5px) rotate(-3deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.7) translateX(0px);
+  }
+}
+
+@keyframes bttSplitMid {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) translateY(0px);
+  }
+  35% {
+    opacity: 1;
+    transform: scale(1.35) translateY(-4px);
+  }
+  75% {
+    opacity: 1;
+    transform: scale(1.1) translateY(-1px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.7) translateY(0px);
+  }
+}
+
+@keyframes bttSplitRight {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) translateX(0px);
+  }
+  35% {
+    opacity: 1;
+    transform: scale(1.2) translateX(9px) rotate(8deg);
+  }
+  75% {
+    opacity: 1;
+    transform: scale(1.05) translateX(5px) rotate(3deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.7) translateX(0px);
+  }
+}
+
+.animate-btt-split-left {
+  animation: bttSplitLeft 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-btt-split-mid {
+  animation: bttSplitMid 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-btt-split-right {
+  animation: bttSplitRight 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Fast Left-Rocket "Btt" micro-interaction on Next & Previous track buttons */
+@keyframes bttFlyLeftFast {
+  0% {
+    opacity: 0;
+    transform: translate3d(30px, 0, 0) scale(0.2);
+    filter: blur(4px);
+  }
+  15% {
+    opacity: 1;
+    transform: translate3d(0px, 0, 0) scale(1.15);
+    filter: blur(0px);
+  }
+  40% {
+    opacity: 1;
+    transform: translate3d(-40px, 0, 0) scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-260px, 0, 0) scale(0.6);
+    filter: blur(6px);
+  }
+}
+
+.animate-btt-fly-left {
+  animation: bttFlyLeftFast 0.42s cubic-bezier(0.12, 0.8, 0.15, 1) forwards;
+  pointer-events: none;
+}
+
+/* Apple iOS Liquid Glass Menu Bar & Specular Refraction */
+.liquid-glass {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.14), inset 0 1px 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.dark .liquid-glass {
+  background: rgba(8, 13, 17, 0.82);
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 16px 48px 0 rgba(0, 0, 0, 0.7), inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* Fluid Apple iOS Spring Transition */
+.transition-liquid {
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.active-liquid-press {
+  transform: scale(0.92);
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+

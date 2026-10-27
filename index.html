@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>Btt Music — Personal Offline Music Player</title>
+    <meta name="description" content="Btt Music: Personal offline music player for iPhone with Btt Smart Mix, Telegram music synchronization, persistent IndexedDB audio storage, and lock-screen audio playback." />
+    <meta property="og:title" content="Btt Music — Personal Offline Music Player" />
+    <meta property="og:description" content="Btt Music: Personal offline music player for iPhone with Btt Smart Mix, Telegram music synchronization, persistent IndexedDB audio storage, and lock-screen audio playback." />
+    <meta property="og:image" content="/apple-touch-icon.png" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    <!-- iOS PWA & Standalone Web App configuration (respecting notch & Dynamic Island) -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Btt Music" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- System-based theme-color for iOS status bar & Safari chrome -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F3EBDD" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#080A09" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <!-- Instant Theme Detector & WebSocket Error Suppressor -->
+    <script>
+      (function() {
+        // Suppress benign WebSocket / Vite HMR disconnection errors in iframe environment
+        window.addEventListener('unhandledrejection', function(event) {
+          var reason = event && event.reason;
+          var msg = reason && (reason.message || String(reason));
+          if (
+            msg && (
+              msg.indexOf('WebSocket') !== -1 ||
+              msg.indexOf('closed without opened') !== -1 ||
+              msg.indexOf('@vite/client') !== -1
+            )
+          ) {
+            event.preventDefault();
+          }
+        });
+
+        function applyUserTheme() {
+          var stored = localStorage.getItem('bttm_theme_mode');
+          var isDark = stored ? stored === 'dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          var root = document.documentElement;
+          if (isDark) {
+            root.classList.add('dark');
+            root.classList.remove('light');
+          } else {
+            root.classList.remove('dark');
+            root.classList.add('light');
+          }
+        }
+        applyUserTheme();
+        if (window.matchMedia) {
+          window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+            if (!localStorage.getItem('bttm_theme_mode')) applyUserTheme();
+          });
+        }
+      })();
+    </script>
+
+    <!-- Official Btt Music App Logo for Apple Home Screen & Touch Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/pwa-192x192.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="/pwa-512x512.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/pwa-192x192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/pwa-512x512.png" />
+    <link rel="icon" type="image/png" href="/app-logo.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <!-- Apple SF Pro System Typography & Monospace -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-[#F3EBDD] dark:bg-[#080A09] text-[#292820] dark:text-[#E8E9DD] antialiased selection:bg-[#C8F169] selection:text-[#292820] dark:selection:bg-[#C8F169] dark:selection:text-[#080A09] overflow-x-hidden font-[-apple-system,BlinkMacSystemFont,'SF_Pro_Display','SF_Pro_Text','SF_Pro',system-ui,sans-serif]">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
