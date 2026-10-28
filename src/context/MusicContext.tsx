@@ -428,13 +428,33 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       activeDeck?.pause();
     });
 
-    navigator.mediaSession.setActionHandler('previoustrack', () => {
-      prevTrackRef.current();
-    });
+    // CRITICAL iOS Lock Screen Requirement:
+    // When seekbackward or seekforward are registered, iOS replaces ⏭ and ⏮ with 10s skip buttons.
+    // Explicitly setting them to null forces iOS to display the native Previous (⏮) and Next (⏭) controls!
+    try {
+      navigator.mediaSession.setActionHandler('seekbackward', null);
+      navigator.mediaSession.setActionHandler('seekforward', null);
+    } catch {
+      // ignore
+    }
 
-    navigator.mediaSession.setActionHandler('nexttrack', () => {
-      nextTrackRef.current();
-    });
+    // Previous Track on Lock Screen & AirPods
+    try {
+      navigator.mediaSession.setActionHandler('previoustrack', () => {
+        prevTrackRef.current();
+      });
+    } catch {
+      // ignore
+    }
+
+    // Next Track on Lock Screen & AirPods
+    try {
+      navigator.mediaSession.setActionHandler('nexttrack', () => {
+        nextTrackRef.current();
+      });
+    } catch {
+      // ignore
+    }
 
     try {
       navigator.mediaSession.setActionHandler('seekto', (details) => {
@@ -444,29 +464,6 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       });
     } catch {
       // ignore
-    }
-
-    // Supported seeking: 10s backward (AirPods gesture / media remote)
-    try {
-      navigator.mediaSession.setActionHandler('seekbackward', (details) => {
-        const offset = details?.seekOffset || 10;
-        const cur = playerStateRef.current.currentTime || 0;
-        seekToRef.current(Math.max(0, cur - offset));
-      });
-    } catch {
-      // ignore if unsupported
-    }
-
-    // Supported seeking: 10s forward (AirPods gesture / media remote)
-    try {
-      navigator.mediaSession.setActionHandler('seekforward', (details) => {
-        const offset = details?.seekOffset || 10;
-        const cur = playerStateRef.current.currentTime || 0;
-        const dur = playerStateRef.current.duration || 9999;
-        seekToRef.current(Math.min(dur, cur + offset));
-      });
-    } catch {
-      // ignore if unsupported
     }
   }, []);
 
@@ -533,6 +530,16 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
       ensureWebAudio();
       applyMasterGain();
+
+      // Prime Deck B on user gesture so iOS allows Smart Mix to play Deck B without gesture
+      if (deckBRef.current && !deckBRef.current.dataset.primed) {
+        deckBRef.current.dataset.primed = 'true';
+        deckBRef.current.muted = true;
+        deckBRef.current.play().then(() => {
+          deckBRef.current?.pause();
+          if (deckBRef.current) deckBRef.current.muted = false;
+        }).catch(() => {});
+      }
 
       // Anchor standard playback onto Deck A
       activeDeckRef.current = 'A';
@@ -1033,17 +1040,18 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                   crossfadeTimerRef.current = null;
                 }
 
-                // Pause old deck and prevent it from triggering handleEnded
+                // Pause old deck gently without removing src or calling load(), preserving iOS gesture privilege!
                 currentDeck.pause();
-                currentDeck.removeAttribute('src');
-                currentDeck.load();
+                currentDeck.currentTime = 0;
+                currentDeck.volume = 0;
 
                 // Standby deck is NOW the active deck, playing uninterrupted from synchronized timestamp!
                 activeDeckRef.current = standbyDeckId;
                 if (standbyDeckGain && audioCtxRef.current) {
                   standbyDeckGain.gain.setValueAtTime(1.0, audioCtxRef.current.currentTime);
                 }
-                standbyDeck.volume = 1;
+                const currentVol = playerStateRef.current.isMuted ? 0 : playerStateRef.current.volume;
+                standbyDeck.volume = currentVol;
                 isCrossfadingRef.current = false;
 
                 const blendedTrack = nextTrackToPlay!;
@@ -1066,9 +1074,11 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             }, 50);
           })
           .catch((err) => {
-            console.warn('Smart Mix next deck play error:', err);
+            console.warn('Smart Mix next deck play error, falling back to seamless nextTrack:', err);
             isCrossfadingRef.current = false;
             setPlayerState((prev) => ({ ...prev, isSmartMixBlending: false }));
+            // Immediate fallback if iOS blocks background autoplay
+            nextTrackRef.current();
           });
       });
     }

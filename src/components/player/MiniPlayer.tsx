@@ -4,11 +4,13 @@ import { useMusic } from '../../context/MusicContext';
 import { BttPlaybackAnimation, BttAnimationTrigger } from './BttPlaybackAnimation';
 
 export const MiniPlayer: React.FC = () => {
-  const { playerState, togglePlayPause, nextTrack, setIsFullScreenPlayerOpen } = useMusic();
+  const { playerState, togglePlayPause, nextTrack, setIsFullScreenPlayerOpen, isFullScreenPlayerOpen } = useMusic();
   const { currentTrack, isPlaying, currentTime, duration, isLoading, isSmartMixBlending } = playerState;
   const [bttTrigger, setBttTrigger] = useState<BttAnimationTrigger | null>(null);
+  const [activeButton, setActiveButton] = useState<'play' | 'next' | null>(null);
 
-  if (!currentTrack) return null;
+  // If no track or full screen player is open, hide mini player to prevent any interference
+  if (!currentTrack || isFullScreenPlayerOpen) return null;
 
   const activeDuration = duration > 0 ? duration : currentTrack.duration || 180;
   const progressPercent = activeDuration > 0 ? Math.min(100, Math.max(0, (currentTime / activeDuration) * 100)) : 0;
@@ -17,20 +19,24 @@ export const MiniPlayer: React.FC = () => {
     e.stopPropagation();
     togglePlayPause();
     setBttTrigger({ id: Date.now(), type: 'play' });
+    setActiveButton('play');
+    setTimeout(() => setActiveButton(null), 400);
   };
 
   const handleMiniNext = (e: React.MouseEvent) => {
     e.stopPropagation();
     nextTrack();
     setBttTrigger({ id: Date.now(), type: 'next' });
+    setActiveButton('next');
+    setTimeout(() => setActiveButton(null), 400);
   };
 
   return (
     <div
-      className="fixed bottom-[calc(4.4rem+max(env(safe-area-inset-bottom,0px),0.5rem))] left-3.5 right-3.5 z-30 max-w-md mx-auto pointer-events-auto select-none"
+      className="fixed bottom-[calc(5.85rem+max(env(safe-area-inset-bottom,0px),0.65rem))] left-3.5 right-3.5 z-35 max-w-md mx-auto pointer-events-auto select-none"
       onClick={() => setIsFullScreenPlayerOpen(true)}
     >
-      <div className="relative overflow-hidden rounded-[1.8rem] bg-[#E8DDC9]/90 dark:bg-[#141815]/95 backdrop-blur-3xl border border-[#176B67]/25 dark:border-[#C8F169]/30 shadow-[0_12px_36px_rgba(23,107,103,0.18)] dark:shadow-[0_14px_44px_rgba(0,0,0,0.75)] p-2.5 flex items-center gap-3.5 cursor-pointer active:scale-[0.98] transition-all">
+      <div className="relative overflow-hidden rounded-[1.8rem] bg-[#E8DDC9]/92 dark:bg-[#141815]/95 backdrop-blur-3xl border border-[#176B67]/25 dark:border-[#C8F169]/30 shadow-[0_12px_36px_rgba(23,107,103,0.18)] dark:shadow-[0_14px_44px_rgba(0,0,0,0.75)] p-2.5 flex items-center gap-3.5 cursor-pointer active:scale-[0.98] transition-all">
         {/* Specular Liquid Top Highlight */}
         <div className="absolute inset-x-4 top-0 h-[1px] bg-gradient-to-r from-transparent via-[#C8F169]/40 dark:via-[#C8F169]/50 to-transparent pointer-events-none" />
 
@@ -86,14 +92,20 @@ export const MiniPlayer: React.FC = () => {
           </p>
         </div>
 
-        {/* Mini Controls */}
+        {/* Mini Controls with BTT signature tactile animation */}
         <div
           className="flex items-center gap-1 shrink-0"
           onClick={(e) => e.stopPropagation()}
         >
           <button
             onClick={handleMiniPlayPause}
-            className="w-10 h-10 flex items-center justify-center text-[#176B67] dark:text-[#C8F169] transition rounded-full hover:bg-[#C8F169]/20 active:scale-90"
+            className={`w-10 h-10 flex items-center justify-center text-[#176B67] dark:text-[#C8F169] rounded-full transition-all duration-200 active:scale-80 ${
+              activeButton === 'play'
+                ? 'scale-115 bg-[#C8F169]/30 shadow-[0_0_16px_rgba(200,241,105,0.6)]'
+                : isPlaying
+                ? 'hover:bg-[#C8F169]/20'
+                : 'hover:bg-[#C8F169]/20'
+            }`}
             aria-label={isPlaying ? 'Pause' : 'Play'}
           >
             {isPlaying ? (
@@ -104,7 +116,9 @@ export const MiniPlayer: React.FC = () => {
           </button>
           <button
             onClick={handleMiniNext}
-            className="p-2.5 text-[#777267] hover:text-[#176B67] dark:text-[#92998F] dark:hover:text-[#C8F169] transition rounded-full active:scale-95"
+            className={`p-2.5 text-[#777267] hover:text-[#176B67] dark:text-[#92998F] dark:hover:text-[#C8F169] rounded-full transition-all duration-200 active:scale-80 ${
+              activeButton === 'next' ? 'translate-x-1 text-[#C8F169] scale-110' : ''
+            }`}
             aria-label="Next track"
           >
             <SkipForward className="w-4 h-4 fill-current" />

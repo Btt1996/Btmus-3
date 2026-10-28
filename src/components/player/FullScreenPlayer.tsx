@@ -15,10 +15,12 @@ import {
   Sparkles,
   Activity,
   Disc3,
+  ExternalLink,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useMusic } from '../../context/MusicContext';
 import { formatDuration } from '../../utils/id3Parser';
+import * as db from '../../services/db';
 import { AddToPlaylistModal } from './AddToPlaylistModal';
 import { QueueModal } from './QueueModal';
 import { SmartMixDrawer } from './SmartMixDrawer';
@@ -39,6 +41,7 @@ export const FullScreenPlayer: React.FC = () => {
     cycleRepeatMode,
     toggleFavorite,
     setPlaybackRate,
+    showToast,
   } = useMusic();
 
   const [isAddToPlaylistOpen, setIsAddToPlaylistOpen] = useState(false);
@@ -48,6 +51,7 @@ export const FullScreenPlayer: React.FC = () => {
 
   // BTT Playback signature animation state
   const [bttTrigger, setBttTrigger] = useState<BttAnimationTrigger | null>(null);
+  const [activeBttButton, setActiveBttButton] = useState<'play' | 'next' | 'prev' | null>(null);
 
   // Seeking Interaction State
   const [isDraggingSeek, setIsDraggingSeek] = useState(false);
@@ -137,20 +141,64 @@ export const FullScreenPlayer: React.FC = () => {
     window.addEventListener('touchend', handleTouchEnd);
   };
 
-  // Playback handlers with BTT Animation Triggers
+  // Play in other app (VLC, Clik, Documents, Files, etc. via native Share Sheet)
+  const handlePlayInOtherApp = async () => {
+    if (!currentTrack) return;
+    try {
+      showToast('Preparing audio for other player app...');
+      const blob = await db.getAudioBlob(currentTrack.id);
+      if (!blob) {
+        showToast('Audio file not found in offline storage');
+        return;
+      }
+      const safeTitle = (currentTrack.title || 'song').replace(/[/\\?%*:|"<>]/g, '_');
+      const ext = currentTrack.fileName?.split('.').pop() || 'mp3';
+      const file = new File([blob], `${safeTitle}.${ext}`, { type: blob.type || 'audio/mpeg' });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: currentTrack.title,
+          text: `Play ${currentTrack.title} in external player`,
+        });
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${safeTitle}.${ext}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+        showToast('Audio file exported to open in other app');
+      }
+    } catch (err: unknown) {
+      if ((err as Error)?.name !== 'AbortError') {
+        showToast('Could not open in other app');
+      }
+    }
+  };
+
+  // Playback handlers with Signature BTT Button Animation Triggers
   const handlePlayPauseClick = () => {
     togglePlayPause();
     setBttTrigger({ id: Date.now(), type: 'play' });
+    setActiveBttButton('play');
+    setTimeout(() => setActiveBttButton(null), 450);
   };
 
   const handleNextClick = () => {
     nextTrack();
     setBttTrigger({ id: Date.now(), type: 'next' });
+    setActiveBttButton('next');
+    setTimeout(() => setActiveBttButton(null), 450);
   };
 
   const handlePrevClick = () => {
     prevTrack();
     setBttTrigger({ id: Date.now(), type: 'previous' });
+    setActiveBttButton('prev');
+    setTimeout(() => setActiveBttButton(null), 450);
   };
 
   return (
@@ -296,6 +344,17 @@ export const FullScreenPlayer: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-1.5 shrink-0">
+              {/* PLAY IN OTHER APP BUTTON */}
+              <button
+                onClick={handlePlayInOtherApp}
+                className="px-2.5 py-1.5 rounded-xl bg-[#E8DDC9]/80 dark:bg-[#141815]/80 text-[#176B67] dark:text-[#C8F169] border border-[#176B67]/25 dark:border-[#C8F169]/30 hover:border-[#C8F169] text-xs font-bold flex items-center gap-1 transition active:scale-90 shadow-xs"
+                title="Play in other app (VLC, Clik, Documents, Files)"
+                aria-label="Play in other app"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+                <span className="text-[11px]">Open in App</span>
+              </button>
+
               {/* RESTORED PROMINENT LYRICS BUTTON */}
               <button
                 onClick={() => setIsLyricsOpen(!isLyricsOpen)}
@@ -396,18 +455,29 @@ export const FullScreenPlayer: React.FC = () => {
               <Shuffle className="w-5 h-5" />
             </button>
 
+            {/* Previous Button with Tactile BTT Animation */}
             <button
               onClick={handlePrevClick}
-              className="p-3 text-[#292820] dark:text-[#E8E9DD] hover:text-[#176B67] dark:hover:text-[#C8F169] rounded-full active:scale-90 transition"
+              className={`p-3 rounded-full text-[#292820] dark:text-[#E8E9DD] hover:text-[#176B67] dark:hover:text-[#C8F169] transition-all duration-200 active:scale-75 ${
+                activeBttButton === 'prev'
+                  ? '-translate-x-2 text-[#C8F169] bg-[#C8F169]/20 shadow-[0_0_20px_rgba(200,241,105,0.6)]'
+                  : ''
+              }`}
               aria-label="Previous track"
             >
               <SkipBack className="w-7 h-7 fill-current" />
             </button>
 
-            {/* Prominent Chartreuse Play/Pause Button */}
+            {/* Prominent Chartreuse Play/Pause Button with Signature BTT Tactile Animation */}
             <button
               onClick={handlePlayPauseClick}
-              className="w-18 h-18 rounded-full bg-[#C8F169] text-[#292820] flex items-center justify-center hover:scale-105 active:scale-90 transition-all duration-300 shadow-[0_8px_28px_rgba(200,241,105,0.45)] select-none"
+              className={`w-18 h-18 rounded-full bg-[#C8F169] text-[#292820] flex items-center justify-center transition-all duration-300 shadow-[0_8px_28px_rgba(200,241,105,0.45)] select-none ${
+                activeBttButton === 'play'
+                  ? 'scale-115 ring-4 ring-[#C8F169]/70 shadow-[0_0_36px_rgba(200,241,105,0.9)]'
+                  : isPlaying
+                  ? 'ring-2 ring-[#C8F169]/40 hover:scale-105 active:scale-90 shadow-[0_0_24px_rgba(200,241,105,0.4)]'
+                  : 'hover:scale-105 active:scale-90'
+              }`}
               aria-label={isPlaying ? 'Pause' : 'Play'}
             >
               {isPlaying ? (
@@ -417,9 +487,14 @@ export const FullScreenPlayer: React.FC = () => {
               )}
             </button>
 
+            {/* Next Button with Tactile BTT Animation */}
             <button
               onClick={handleNextClick}
-              className="p-3 text-[#292820] dark:text-[#E8E9DD] hover:text-[#176B67] dark:hover:text-[#C8F169] rounded-full active:scale-90 transition"
+              className={`p-3 rounded-full text-[#292820] dark:text-[#E8E9DD] hover:text-[#176B67] dark:hover:text-[#C8F169] transition-all duration-200 active:scale-75 ${
+                activeBttButton === 'next'
+                  ? 'translate-x-2 text-[#C8F169] bg-[#C8F169]/20 shadow-[0_0_20px_rgba(200,241,105,0.6)]'
+                  : ''
+              }`}
               aria-label="Next track"
             >
               <SkipForward className="w-7 h-7 fill-current" />

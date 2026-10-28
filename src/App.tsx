@@ -39,7 +39,7 @@ function ScreenLoadingFallback() {
 }
 
 function MainLayout() {
-  const [currentTab, setCurrentTab] = useState<TabType | 'playlists' | 'sync' | 'settings'>('home');
+  const [currentTab, setCurrentTab] = useState<TabType | 'playlists' | 'sync' | 'settings' | 'search'>('home');
   const [selectedPlaylistId, setSelectedPlaylistId] = useState<string | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
@@ -203,12 +203,12 @@ function MainLayout() {
         </div>
       </header>
 
-      {/* Main View Area */}
+      {/* Main View Area with spacious safe-area padding so player & bar never overlap content */}
       <main
         className={`flex-1 flex flex-col ${
           playerState.currentTrack
-            ? 'pb-[calc(8.5rem+env(safe-area-inset-bottom,0px))]'
-            : 'pb-[calc(5rem+env(safe-area-inset-bottom,0px))]'
+            ? 'pb-[calc(11.5rem+env(safe-area-inset-bottom,0px))]'
+            : 'pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))]'
         }`}
       >
         {currentTab === 'home' && (
@@ -234,7 +234,7 @@ function MainLayout() {
             />
           )}
 
-          {currentTab === 'sync' && <SyncScreen fileInputRef={fileInputRef} />}
+          {(currentTab === 'import' || currentTab === 'sync') && <SyncScreen fileInputRef={fileInputRef} />}
 
           {currentTab === 'settings' && <SettingsScreen />}
         </Suspense>
@@ -246,9 +246,15 @@ function MainLayout() {
       {/* Fullscreen Player Modal with Circular Dial */}
       <FullScreenPlayer />
 
-      {/* Liquid Glass Bottom Navigation (4 tabs: Home, Search, Library, Player) */}
+      {/* Liquid Glass Bottom Navigation (4 tabs: Home, Library, Playlists, Import) */}
       <BottomNav
-        currentTab={currentTab === 'search' || currentTab === 'library' ? currentTab : 'home'}
+        currentTab={
+          currentTab === 'library' || currentTab === 'playlists' || currentTab === 'import'
+            ? currentTab
+            : currentTab === 'sync'
+            ? 'import'
+            : 'home'
+        }
         onSelectTab={(tab) => {
           setSelectedPlaylistId(null);
           setCurrentTab(tab);

@@ -1,9 +1,9 @@
 import React from 'react';
-import { Home, Search, Library, Disc3 } from 'lucide-react';
+import { Home, Library, ListMusic, Download } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useMusic } from '../../context/MusicContext';
 
-export type TabType = 'home' | 'search' | 'library' | 'player';
+export type TabType = 'home' | 'library' | 'playlists' | 'import';
 
 interface BottomNavProps {
   currentTab: TabType;
@@ -11,21 +11,15 @@ interface BottomNavProps {
 }
 
 export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab }) => {
-  const { playerState, setIsFullScreenPlayerOpen } = useMusic();
-
   const tabs: { id: TabType; label: string; icon: React.FC<{ className?: string }> }[] = [
     { id: 'home', label: 'Home', icon: Home },
-    { id: 'search', label: 'Search', icon: Search },
     { id: 'library', label: 'Library', icon: Library },
-    { id: 'player', label: 'Player', icon: Disc3 },
+    { id: 'playlists', label: 'Playlists', icon: ListMusic },
+    { id: 'import', label: 'Import', icon: Download },
   ];
 
   const handleTabPress = (tabId: TabType) => {
-    if (tabId === 'player') {
-      setIsFullScreenPlayerOpen(true);
-    } else {
-      onSelectTab(tabId);
-    }
+    onSelectTab(tabId);
   };
 
   return (
@@ -40,7 +34,6 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab })
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = currentTab === tab.id;
-              const isPlayingTrack = tab.id === 'player' && playerState.isPlaying;
 
               return (
                 <button
@@ -50,7 +43,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab })
                   aria-label={tab.label}
                 >
                   {/* Fluid Liquid Glass Capsule Indicator */}
-                  {isActive && tab.id !== 'player' && (
+                  {isActive && (
                     <motion.div
                       layoutId="liquidGlassTabIndicator"
                       transition={{
@@ -66,16 +59,14 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab })
                   <div className="relative z-10 flex flex-col items-center">
                     <Icon
                       className={`w-5 h-5 transition-all duration-200 ${
-                        isActive && tab.id !== 'player'
+                        isActive
                           ? 'text-[#176B67] dark:text-[#C8F169] scale-110 stroke-[2.4]'
-                          : isPlayingTrack
-                          ? 'text-[#176B67] dark:text-[#C8F169] animate-spin-slow stroke-[2]'
                           : 'text-[#777267] dark:text-[#92998F] stroke-[1.8] hover:text-[#292820] dark:hover:text-[#E8E9DD]'
                       }`}
                     />
                     <span
                       className={`text-[9.5px] tracking-tight mt-0.5 font-sans transition-colors duration-200 ${
-                        isActive && tab.id !== 'player'
+                        isActive
                           ? 'text-[#176B67] dark:text-[#C8F169] font-black'
                           : 'text-[#777267] dark:text-[#92998F] font-medium'
                       }`}

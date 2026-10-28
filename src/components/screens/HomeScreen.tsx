@@ -9,7 +9,7 @@ import { SmartMixDrawer } from '../player/SmartMixDrawer';
 import { PlaylistImportModal } from '../import/PlaylistImportModal';
 
 interface HomeScreenProps {
-  onGoToTab: (tab: 'home' | 'search' | 'library' | 'playlists' | 'sync' | 'settings') => void;
+  onGoToTab: (tab: 'home' | 'search' | 'library' | 'playlists' | 'sync' | 'settings' | 'import') => void;
   onOpenPlaylist: (playlistId: string) => void;
   onTriggerFileInput: () => void;
 }
@@ -188,11 +188,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       </div>
 
       {/* Prominent Quick Sync & Storage Metric Card */}
-      <div className="p-4 rounded-3xl bg-[#E8DDC9]/60 dark:bg-[#141815]/70 backdrop-blur-xl border border-[#292820]/10 dark:border-white/10 shadow-sm flex items-center justify-between gap-3">
+      <div className="p-4 rounded-3xl bg-[#E8DDC9]/75 dark:bg-[#141815]/80 backdrop-blur-2xl border border-[#292820]/10 dark:border-white/10 shadow-sm flex items-center justify-between gap-3">
         <div className="space-y-1 min-w-0 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs font-bold text-[#292820] dark:text-[#E8E9DD]">Music Library</span>
-            <span className="px-2 py-0.5 rounded-md bg-[#292820]/10 dark:bg-white/10 text-[#292820] dark:text-[#E8E9DD] text-[10px] font-bold font-mono">
+            <span className="px-2 py-0.5 rounded-full bg-[#176B67]/15 dark:bg-[#C8F169]/15 text-[#176B67] dark:text-[#C8F169] text-[10px] font-bold font-mono">
               {tracks.length} Songs Stored
             </span>
           </div>
@@ -204,7 +204,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         <div className="flex items-center gap-1.5 shrink-0">
           <button
             onClick={() => setIsImportModalOpen(true)}
-            className="px-3 py-2 rounded-xl bg-[#176B67] text-[#E8DDC9] dark:bg-[#C8F169] dark:text-[#080A09] text-xs font-bold flex items-center gap-1.5 transition active:scale-95 shadow-sm"
+            className="px-3.5 py-2 rounded-xl bg-[#176B67] text-[#E8DDC9] dark:bg-[#C8F169] dark:text-[#080A09] text-xs font-bold flex items-center gap-1.5 transition active:scale-95 shadow-sm"
           >
             <Download className="w-3.5 h-3.5" />
             Import
@@ -219,61 +219,32 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         </div>
       </div>
 
-      {/* Playlists Quick Shortcuts */}
-      {playlists.length > 0 && (
-        <section className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-[#292820] dark:text-[#E8E9DD] flex items-center gap-1.5">
-              <ListMusic className="w-4 h-4 text-[#176B67] dark:text-[#C8F169]" /> Playlists
-            </h3>
-            <button
-              onClick={() => onGoToTab('playlists')}
-              className="text-xs text-[#777267] dark:text-[#92998F] hover:text-[#292820] dark:hover:text-[#E8E9DD] font-semibold"
-            >
-              See all ({playlists.length})
-            </button>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2.5">
-            {playlists.slice(0, 4).map((pl) => (
-              <button
-                key={pl.id}
-                onClick={() => onOpenPlaylist(pl.id)}
-                className="p-3 rounded-2xl bg-[#E8DDC9]/50 dark:bg-[#141815]/60 border border-[#292820]/10 dark:border-white/10 hover:border-[#176B67] dark:hover:border-[#C8F169] transition flex items-center gap-2.5 text-left group"
-              >
-                <div className="w-10 h-10 rounded-xl bg-[#292820]/10 dark:bg-white/10 flex items-center justify-center text-[#777267] dark:text-[#92998F] group-hover:text-[#292820] dark:group-hover:text-white shrink-0">
-                  <ListMusic className="w-5 h-5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h4 className="text-xs font-bold text-[#292820] dark:text-[#E8E9DD] truncate">
-                    {pl.name}
-                  </h4>
-                  <p className="text-[10px] text-[#777267] dark:text-[#92998F]">
-                    {pl.trackIds.length} track{pl.trackIds.length !== 1 ? 's' : ''}
-                  </p>
-                </div>
-              </button>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Recently Played */}
+      {/* SECTION: RECENTLY PLAYED (Apple-Inspired Horizontal Song List) */}
       {recentlyPlayed.length > 0 && (
         <section className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-[#292820] dark:text-[#E8E9DD]">Recently Played</h3>
-            <span className="text-[11px] text-[#777267] dark:text-[#92998F] font-mono">
+          <div className="flex items-end justify-between">
+            <div>
+              <span className="text-[10px] font-mono uppercase tracking-widest text-[#176B67] dark:text-[#C8F169] font-bold">
+                Jump Back In
+              </span>
+              <h3 className="text-lg font-bold text-[#292820] dark:text-[#E8E9DD] tracking-tight">
+                Recently Played
+              </h3>
+            </div>
+            <span className="text-xs text-[#777267] dark:text-[#92998F] font-mono">
               {recentlyPlayed.length} songs
             </span>
           </div>
 
-          <div className="space-y-2">
+          {/* Horizontal Scrolling Song Carousel */}
+          <div className="flex gap-3.5 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-none snap-x snap-mandatory">
             {recentlyPlayed.map((track) => (
-              <TrackRow
+              <SongHorizontalCard
                 key={track.id}
                 track={track}
                 analysis={trackAnalyses[track.id]}
+                isCurrent={playerState.currentTrack?.id === track.id}
+                isPlaying={playerState.isPlaying && playerState.currentTrack?.id === track.id}
                 onPlay={() => playTrack(track, recentlyPlayed)}
                 onToggleFavorite={() => toggleFavorite(track.id)}
               />
@@ -282,72 +253,119 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         </section>
       )}
 
-      {/* Favorites Carousel */}
+      {/* SECTION: FAVORITES (Apple-Inspired Horizontal Song List) */}
       {favoriteTracks.length > 0 && (
         <section className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-[#292820] dark:text-[#E8E9DD] flex items-center gap-1.5">
-              <Heart className="w-4 h-4 fill-current text-rose-500" /> Favorites
-            </h3>
+          <div className="flex items-end justify-between">
+            <div>
+              <span className="text-[10px] font-mono uppercase tracking-widest text-[#176B67] dark:text-[#C8F169] font-bold">
+                Loved Tracks
+              </span>
+              <h3 className="text-lg font-bold text-[#292820] dark:text-[#E8E9DD] tracking-tight flex items-center gap-1.5">
+                <Heart className="w-4 h-4 fill-current text-rose-500" /> Favorites
+              </h3>
+            </div>
             <button
               onClick={() => onGoToTab('library')}
-              className="text-xs text-[#777267] dark:text-[#92998F] hover:text-[#292820] dark:hover:text-[#E8E9DD] font-semibold"
+              className="text-xs text-[#176B67] dark:text-[#C8F169] hover:underline font-semibold"
             >
-              View in library
+              See all ({tracks.filter((t) => t.isFavorite).length})
             </button>
           </div>
 
-          <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-none">
+          {/* Horizontal Scrolling Favorites Carousel */}
+          <div className="flex gap-3.5 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-none snap-x snap-mandatory">
             {favoriteTracks.map((track) => (
-              <div
+              <SongHorizontalCard
                 key={track.id}
-                onClick={() => playTrack(track, favoriteTracks)}
-                className="w-28 shrink-0 cursor-pointer group space-y-1.5"
-              >
-                <div className="w-28 h-28 rounded-2xl bg-[#E8DDC9] dark:bg-[#141815] border border-[#292820]/10 dark:border-white/10 overflow-hidden relative shadow-sm group-hover:scale-[1.02] transition-transform">
-                  {track.artworkUrl ? (
-                    <img src={track.artworkUrl} alt={track.title} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-[#777267] dark:text-[#92998F]">
-                      <Music className="w-8 h-8" />
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                    <Play className="w-7 h-7 text-[#C8F169] fill-current" />
-                  </div>
-                </div>
-                <h4 className="text-xs font-semibold text-[#292820] dark:text-[#E8E9DD] truncate">{track.title}</h4>
-                <p className="text-[10px] text-[#777267] dark:text-[#92998F] truncate">{track.artist}</p>
-              </div>
+                track={track}
+                analysis={trackAnalyses[track.id]}
+                isCurrent={playerState.currentTrack?.id === track.id}
+                isPlaying={playerState.isPlaying && playerState.currentTrack?.id === track.id}
+                onPlay={() => playTrack(track, favoriteTracks)}
+                onToggleFavorite={() => toggleFavorite(track.id)}
+              />
             ))}
           </div>
         </section>
       )}
 
-      {/* Recently Downloaded */}
+      {/* SECTION: RECENTLY DOWNLOADED / ADDED (Apple-Inspired Horizontal Song List) */}
       <section className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-bold text-[#292820] dark:text-[#E8E9DD]">Recently Downloaded</h3>
+        <div className="flex items-end justify-between">
+          <div>
+            <span className="text-[10px] font-mono uppercase tracking-widest text-[#176B67] dark:text-[#C8F169] font-bold">
+              Offline Vault
+            </span>
+            <h3 className="text-lg font-bold text-[#292820] dark:text-[#E8E9DD] tracking-tight">
+              Recently Downloaded
+            </h3>
+          </div>
           <button
             onClick={() => onGoToTab('library')}
-            className="text-xs text-[#777267] dark:text-[#92998F] hover:text-[#292820] dark:hover:text-[#E8E9DD] font-semibold"
+            className="text-xs text-[#176B67] dark:text-[#C8F169] hover:underline font-semibold"
           >
-            All songs ({tracks.length})
+            All songs ({tracks.length}) &rarr;
           </button>
         </div>
 
-        <div className="space-y-2">
+        {/* Horizontal Scrolling Recently Downloaded Carousel */}
+        <div className="flex gap-3.5 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-none snap-x snap-mandatory">
           {recentlyAdded.map((track) => (
-            <TrackRow
+            <SongHorizontalCard
               key={track.id}
               track={track}
               analysis={trackAnalyses[track.id]}
+              isCurrent={playerState.currentTrack?.id === track.id}
+              isPlaying={playerState.isPlaying && playerState.currentTrack?.id === track.id}
               onPlay={() => playTrack(track, recentlyAdded)}
               onToggleFavorite={() => toggleFavorite(track.id)}
             />
           ))}
         </div>
       </section>
+
+      {/* Playlists Quick Shortcuts */}
+      {playlists.length > 0 && (
+        <section className="space-y-3">
+          <div className="flex items-end justify-between">
+            <div>
+              <span className="text-[10px] font-mono uppercase tracking-widest text-[#176B67] dark:text-[#C8F169] font-bold">
+                Collections
+              </span>
+              <h3 className="text-lg font-bold text-[#292820] dark:text-[#E8E9DD] flex items-center gap-1.5 tracking-tight">
+                <ListMusic className="w-4 h-4 text-[#176B67] dark:text-[#C8F169]" /> Playlists
+              </h3>
+            </div>
+            <button
+              onClick={() => onGoToTab('playlists')}
+              className="text-xs text-[#176B67] dark:text-[#C8F169] hover:underline font-semibold"
+            >
+              See all ({playlists.length})
+            </button>
+          </div>
+
+          <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-none snap-x snap-mandatory">
+            {playlists.map((pl) => (
+              <button
+                key={pl.id}
+                onClick={() => onOpenPlaylist(pl.id)}
+                className="w-40 shrink-0 p-3 rounded-2xl bg-[#E8DDC9]/70 dark:bg-[#141815]/80 backdrop-blur-xl border border-[#292820]/10 dark:border-white/10 hover:border-[#176B67] dark:hover:border-[#C8F169] transition flex flex-col text-left group active:scale-95"
+              >
+                <div className="w-full aspect-square rounded-xl bg-[#292820]/10 dark:bg-white/10 flex items-center justify-center text-[#777267] dark:text-[#92998F] group-hover:text-[#176B67] dark:group-hover:text-[#C8F169] shadow-inner mb-2.5">
+                  <ListMusic className="w-8 h-8" />
+                </div>
+                <h4 className="text-xs font-bold text-[#292820] dark:text-[#E8E9DD] truncate w-full">
+                  {pl.name}
+                </h4>
+                <p className="text-[10px] text-[#777267] dark:text-[#92998F] font-mono mt-0.5">
+                  {pl.trackIds.length} track{pl.trackIds.length !== 1 ? 's' : ''}
+                </p>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Smart Mix Drawer */}
       <SmartMixDrawer
@@ -365,70 +383,93 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   );
 };
 
-export const TrackRow: React.FC<{
+// Apple-Inspired Horizontal Song Card
+export const SongHorizontalCard: React.FC<{
   track: Track;
   analysis?: any;
+  isCurrent?: boolean;
+  isPlaying?: boolean;
   onPlay: () => void;
   onToggleFavorite: () => void;
-}> = ({ track, analysis, onPlay, onToggleFavorite }) => {
+}> = ({ track, analysis, isCurrent, isPlaying, onPlay, onToggleFavorite }) => {
   return (
     <div
       onClick={onPlay}
-      className="flex items-center justify-between p-2.5 rounded-2xl bg-[#E8DDC9]/50 dark:bg-[#141815]/60 hover:bg-[#E8DDC9] dark:hover:bg-[#141815] border border-[#292820]/10 dark:border-white/10 transition cursor-pointer group active:scale-[0.99]"
+      className={`w-36 sm:w-40 shrink-0 p-2.5 rounded-2xl bg-[#E8DDC9]/70 dark:bg-[#141815]/80 backdrop-blur-xl border transition-all cursor-pointer group snap-start active:scale-[0.97] select-none ${
+        isCurrent
+          ? 'border-[#176B67] dark:border-[#C8F169] shadow-[0_0_16px_rgba(200,241,105,0.25)]'
+          : 'border-[#292820]/10 dark:border-white/10 hover:border-[#176B67]/40 dark:hover:border-[#C8F169]/40'
+      }`}
     >
-      <div className="flex items-center gap-3 min-w-0 flex-1">
-        <div className="w-10 h-10 rounded-xl bg-[#292820]/10 dark:bg-white/10 shrink-0 overflow-hidden relative flex items-center justify-center border border-[#292820]/10 dark:border-white/10">
-          {track.artworkUrl ? (
-            <img src={track.artworkUrl} alt={track.title} className="w-full h-full object-cover" />
-          ) : (
-            <Music className="w-4 h-4 text-[#777267] dark:text-[#92998F]" />
-          )}
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-            <Play className="w-4 h-4 text-[#C8F169] fill-current ml-0.5" />
+      {/* Artwork Box */}
+      <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-[#292820]/10 dark:bg-white/10 shadow-sm border border-[#292820]/10 dark:border-white/10 mb-2">
+        {track.artworkUrl ? (
+          <img
+            src={track.artworkUrl}
+            alt={track.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-[#777267] dark:text-[#92998F]">
+            <Music className="w-8 h-8" />
           </div>
-        </div>
+        )}
 
-        <div className="min-w-0 flex-1 pr-2">
-          <h4 className="text-xs font-bold text-[#292820] dark:text-[#E8E9DD] truncate">
-            {track.title}
-          </h4>
-          <div className="flex items-center gap-1.5 text-[10px] text-[#777267] dark:text-[#92998F] truncate mt-0.5">
-            <span className="truncate">{track.artist}</span>
-            {track.telegramSource && (
-              <>
-                <span>•</span>
-                <span className="text-[#292820] dark:text-[#E8E9DD] flex items-center gap-0.5 shrink-0">
-                  <Send className="w-2.5 h-2.5 text-[#176B67] dark:text-[#C8F169]" />
-                  {track.telegramSource.topicName || track.telegramSource.chatTitle || 'TG'}
-                </span>
-              </>
-            )}
-            {analysis && (
-              <>
-                <span>•</span>
-                <span className="font-mono font-medium shrink-0 text-[#176B67] dark:text-[#C8F169]">
-                  {analysis.bpm} BPM • {analysis.camelot}
-                </span>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-2 shrink-0">
-        <span className="text-[10px] font-mono text-[#777267] dark:text-[#92998F]">
-          {formatDuration(track.duration)}
-        </span>
+        {/* Favorite indicator pill top right */}
         <button
           onClick={(e) => {
             e.stopPropagation();
             onToggleFavorite();
           }}
-          className="p-1.5 text-[#777267] dark:text-[#92998F] hover:text-rose-500 transition"
+          className={`absolute top-1.5 right-1.5 p-1.5 rounded-full backdrop-blur-md transition ${
+            track.isFavorite
+              ? 'bg-rose-500/20 text-rose-500'
+              : 'bg-black/30 text-white/70 hover:text-white opacity-0 group-hover:opacity-100'
+          }`}
           aria-label="Toggle favorite"
         >
-          <Heart className={`w-4 h-4 ${track.isFavorite ? 'fill-current text-rose-500' : ''}`} />
+          <Heart className={`w-3 h-3 ${track.isFavorite ? 'fill-current' : ''}`} />
         </button>
+
+        {/* Play Icon / Playing Indicator Overlay */}
+        <div
+          className={`absolute inset-0 bg-black/35 flex items-center justify-center transition-opacity ${
+            isPlaying || isCurrent ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+          }`}
+        >
+          <div className="w-9 h-9 rounded-full bg-[#C8F169] text-[#292820] flex items-center justify-center shadow-md scale-95 group-hover:scale-105 transition-transform">
+            {isPlaying ? (
+              <span className="flex items-center gap-0.5">
+                <span className="w-1 h-3 bg-[#292820] rounded-full animate-bounce" />
+                <span className="w-1 h-4 bg-[#292820] rounded-full animate-bounce [animation-delay:0.15s]" />
+                <span className="w-1 h-2 bg-[#292820] rounded-full animate-bounce [animation-delay:0.3s]" />
+              </span>
+            ) : (
+              <Play className="w-4 h-4 fill-current ml-0.5" />
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Song Metadata with Apple typography */}
+      <h4 className="text-xs font-bold text-[#292820] dark:text-[#E8E9DD] truncate leading-tight">
+        {track.title}
+      </h4>
+      <p className="text-[11px] text-[#777267] dark:text-[#92998F] truncate mt-0.5 font-medium">
+        {track.artist || 'Unknown'}
+      </p>
+
+      {/* Footer Info Pill */}
+      <div className="flex items-center justify-between text-[10px] font-mono text-[#777267] dark:text-[#92998F] mt-1 pt-1 border-t border-[#292820]/5 dark:border-white/5">
+        <span>{formatDuration(track.duration)}</span>
+        {analysis ? (
+          <span className="text-[#176B67] dark:text-[#C8F169] font-bold">
+            {analysis.bpm} BPM
+          </span>
+        ) : track.fileSize ? (
+          <span>{formatFileSize(track.fileSize)}</span>
+        ) : null}
       </div>
     </div>
   );
