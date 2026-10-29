@@ -117,10 +117,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           </div>
           <div>
             <div className="text-xs font-black text-[#292820] dark:text-[#E8E9DD] tracking-tight">
-              X1 & X2 Music Discovery
+              Unified Music Search & Discovery
             </div>
             <p className="text-[11px] text-[#777267] dark:text-[#92998F]">
-              Search Apple iTunes, YouTube recordings, and SoundCloud
+              Search songs across YouTube, Spotify, Telegram, and CC with instant downloads
             </p>
           </div>
         </div>

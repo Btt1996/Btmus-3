@@ -1053,7 +1053,7 @@ export const PlaylistImportModal: React.FC<PlaylistImportModalProps> = ({
         <SpotDLInfoModal
           isOpen={isSpotDLInfoOpen}
           onClose={() => setIsSpotDLInfoOpen(false)}
-          bridgeUrl={settings.spotDLBridgeUrl}
+          bridgeUrl={settings.spotDLBridgeUrl || ''}
           onSaveBridgeUrl={(url) => {
             setSettings((prev) => ({
               ...prev,

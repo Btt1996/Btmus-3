@@ -95,19 +95,34 @@ export interface ImportSummary {
 }
 
 export interface ImportSettings {
-  matchingThreshold: number; // default 75 (0 - 100)
+  matchingThreshold: number; // default 70 (0 - 100)
   enableJamendo: boolean;
   enableInternetArchive: boolean;
   enableFMA: boolean; // Free Music Archive open catalog
   enableTelegramMatch: boolean; // Telegram Bot / Channel Music Sync
   enableSpotDLBridge: boolean;
-  spotDLBridgeUrl: string; // e.g. http://localhost:8080 or custom server
-  spotifyClientId: string;
-  spotifyClientSecret: string;
+  spotDLBridgeUrl?: string; // e.g. http://localhost:8080 or custom server
+  spotifyClientId?: string;
+  spotifyClientSecret?: string;
   requireConfirmationForMedium: boolean; // if confidence < 80%, prompt user
   preferLocalCache: boolean; // Check local IndexedDB first
   maxRetries: number; // Retry transient failures with exponential backoff
 }
+
+export const DEFAULT_IMPORT_SETTINGS: ImportSettings = {
+  matchingThreshold: 70,
+  enableJamendo: true,
+  enableInternetArchive: true,
+  enableFMA: true,
+  enableTelegramMatch: true,
+  enableSpotDLBridge: false,
+  spotDLBridgeUrl: '',
+  spotifyClientId: '',
+  spotifyClientSecret: '',
+  requireConfirmationForMedium: false,
+  preferLocalCache: true,
+  maxRetries: 2,
+};
 
 // Persistent Recording Cache Mapping
 export interface RecordingCacheEntry {

@@ -11,6 +11,7 @@ import {
 import { Track, Playlist } from '../../types/music';
 import { getAllTracks, saveTrack, savePlaylist, findVerifiedCachedTrack, getSetting } from '../db';
 import { searchSpotDLBridge, checkSpotDLBridgeStatus } from './spotdlBridge';
+import { recordDownloadHistory, recordFailedImport, recordDuplicateDetection } from '../historyService';
 
 // Default Jamendo API Developer Key (public community client ID for open music)
 const DEFAULT_JAMENDO_CLIENT_ID = '96cf1c7c';
@@ -1047,3 +1048,141 @@ export async function retryIndividualTrack(
     return { success: false, error: msg };
   }
 }
+
+/**
+ * Resolves an individual track metadata against authorized X2 providers,
+ * downloads and verifies the audio blob, persists to IndexedDB, and updates history.
+ */
+export async function resolveAndDownloadSingleTrack(
+  meta: {
+    title: string;
+    artist: string;
+    album?: string;
+    durationMs?: number;
+    artworkUrl?: string | null;
+    isrc?: string | null;
+    source?: string;
+  },
+  settings: ImportSettings,
+  onProgress?: (percent: number, status: string) => void
+): Promise<{
+  success: boolean;
+  status: 'completed' | 'already_local' | 'unavailable' | 'failed';
+  track?: Track;
+  error?: string;
+}> {
+  const normMeta: NormalizedTrackMetadata = {
+    title: meta.title,
+    artists: meta.artist ? [meta.artist] : ['Unknown Artist'],
+    album: meta.album || 'Single Import',
+    durationMs: meta.durationMs || 0,
+    isrc: meta.isrc || null,
+    artworkUrl: meta.artworkUrl || null,
+    position: 0,
+  };
+
+  // Step 1: Check verified local IndexedDB cache
+  if (onProgress) onProgress(10, 'Checking local library cache...');
+  const cached = await searchLocalLibraryCache(normMeta);
+  if (cached) {
+    const localId = cached.providerTrackId.replace('local_', '');
+    const { getTrack } = await import('../db');
+    const existingTrack = await getTrack(localId);
+    if (existingTrack) {
+      await recordDuplicateDetection({
+        title: meta.title,
+        artist: meta.artist,
+        matchedTrackId: localId,
+      });
+      if (onProgress) onProgress(100, 'Already in local library');
+      return { success: true, status: 'already_local', track: existingTrack };
+    }
+  }
+
+  // Step 2: Search configured audio providers (Jamendo, Archive, FMA, Telegram, SpotDL)
+  if (onProgress) onProgress(30, 'Searching authorized audio providers...');
+  const searchResult = await searchAllX2Providers(normMeta, settings);
+  const bestMatch = searchResult.matches[0];
+
+  if (!bestMatch || bestMatch.confidenceScore < 45) {
+    const errorMsg =
+      searchResult.failureCategory === 'network_failure'
+        ? 'Network error reaching audio repositories'
+        : 'No authorized audio match found across open repositories or Telegram sync';
+    await recordFailedImport({
+      title: meta.title,
+      artist: meta.artist,
+      album: meta.album,
+      source: meta.source || 'x2_engine',
+      errorReason: errorMsg,
+      durationMs: meta.durationMs,
+      isrc: meta.isrc,
+    });
+    if (onProgress) onProgress(0, errorMsg);
+    return { success: false, status: 'unavailable', error: errorMsg };
+  }
+
+  // Step 3: Download & Validate Audio Blob
+  if (onProgress) onProgress(50, `Downloading from ${bestMatch.provider.toUpperCase()}...`);
+  try {
+    const { blob, mimeType } = await downloadAndValidateAudio(
+      bestMatch.downloadUrl,
+      (p) => {
+        if (onProgress) onProgress(50 + Math.round(p * 0.4), `Downloading audio... ${p}%`);
+      }
+    );
+
+    if (onProgress) onProgress(95, 'Saving to local music vault...');
+    const trackId = `track_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const newTrack: Track = {
+      id: trackId,
+      title: meta.title,
+      artist: meta.artist || bestMatch.artist || 'Unknown Artist',
+      album: meta.album || 'Imported Audio',
+      duration: bestMatch.durationSeconds || (meta.durationMs ? Math.round(meta.durationMs / 1000) : 0),
+      fileSize: blob.size,
+      mimeType,
+      fileName: `${meta.title}.${bestMatch.format || 'mp3'}`,
+      downloadDate: Date.now(),
+      isFavorite: false,
+      playCount: 0,
+      artworkUrl: meta.artworkUrl || undefined,
+      telegramSource: {
+        chatTitle: 'BttM Discovery Download',
+        topicName: bestMatch.provider.toUpperCase(),
+        sourceType: 'manual',
+      },
+    };
+
+    await saveTrack(newTrack, blob);
+
+    await recordDownloadHistory({
+      title: newTrack.title,
+      artist: newTrack.artist,
+      album: newTrack.album,
+      source: bestMatch.provider,
+      status: 'completed',
+      localTrackId: trackId,
+      artworkUrl: newTrack.artworkUrl,
+      durationSeconds: newTrack.duration,
+      fileSizeBytes: blob.size,
+    });
+
+    if (onProgress) onProgress(100, 'Saved to library!');
+    return { success: true, status: 'completed', track: newTrack };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Audio download failed';
+    await recordFailedImport({
+      title: meta.title,
+      artist: meta.artist,
+      album: meta.album,
+      source: meta.source || bestMatch.provider,
+      errorReason: msg,
+      durationMs: meta.durationMs,
+      isrc: meta.isrc,
+    });
+    if (onProgress) onProgress(0, msg);
+    return { success: false, status: 'failed', error: msg };
+  }
+}
+

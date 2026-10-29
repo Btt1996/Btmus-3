@@ -16,6 +16,9 @@ import {
   Share2,
   UploadCloud,
   FileText,
+  Search,
+  History,
+  ListMusic,
 } from 'lucide-react';
 import { useMusic } from '../../context/MusicContext';
 import {
@@ -29,6 +32,9 @@ import { saveTrack, savePlaylist, exportLibraryBackup, importLibraryBackup } fro
 import { parseAudioMetadata, formatFileSize } from '../../utils/id3Parser';
 import { SAMPLE_AUDIO_PRESETS, createToneAudioBlob } from '../../utils/sampleTracks';
 import { PlaylistImportModal } from '../import/PlaylistImportModal';
+import { SpotifyPlaylistReviewModal } from '../import/SpotifyPlaylistReviewModal';
+import { TelegramDiscoveryModal } from '../import/TelegramDiscoveryModal';
+import { MusicHistoryModal } from '../common/MusicHistoryModal';
 
 interface SyncScreenProps {
   fileInputRef: React.RefObject<HTMLInputElement | null>;
@@ -48,6 +54,10 @@ export const SyncScreen: React.FC<SyncScreenProps> = ({ fileInputRef }) => {
 
   const [activeTab, setActiveTab] = useState<'import' | 'bot' | 'manual' | 'database' | 'guide'>('import');
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isSpotifyReviewOpen, setIsSpotifyReviewOpen] = useState(false);
+  const [isTelegramDiscoveryOpen, setIsTelegramDiscoveryOpen] = useState(false);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [spotifyUrlInput, setSpotifyUrlInput] = useState('');
   const [isExportingDb, setIsExportingDb] = useState(false);
   const [isImportingDb, setIsImportingDb] = useState(false);
   const dbFileRef = React.useRef<HTMLInputElement | null>(null);
@@ -481,49 +491,142 @@ export const SyncScreen: React.FC<SyncScreenProps> = ({ fileInputRef }) => {
         </button>
       </div>
 
-      {/* TAB 0: PLAYLIST IMPORT (SPOTIFY / X1 / X2) */}
+      {/* TAB 0: UNIFIED DISCOVERY & SPOTIFY PLAYLIST IMPORT */}
       {activeTab === 'import' && (
         <div className="space-y-4 animate-in fade-in duration-150">
-          <div className="p-5 rounded-3xl bg-zinc-100 dark:bg-[#024E5B]/20 border border-zinc-200 dark:border-[#02ABB0]/30 space-y-4 shadow-sm">
+          {/* 1. SPOTIFY PLAYLIST REVIEW & TRACK DOWNLOAD CARD */}
+          <div className="p-4 sm:p-5 rounded-3xl bg-[#E8DDC9]/70 dark:bg-[#141815]/75 border border-[#176B67]/25 dark:border-[#C8F169]/30 space-y-4 shadow-sm backdrop-blur-xl">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-[#02ABB0] text-black flex items-center justify-center font-bold shrink-0 shadow-md">
-                <Sparkles className="w-6 h-6" />
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-500 flex items-center justify-center font-bold shrink-0 shadow-xs">
+                <ListMusic className="w-6 h-6" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-black tracking-widest uppercase text-[#02ABB0] font-serif">
-                    X1 / X2 PIPELINE
+                  <span className="text-[10px] font-mono font-bold tracking-widest uppercase text-emerald-600 dark:text-emerald-400">
+                    Spotify Integration
                   </span>
                   <span className="px-1.5 py-0.2 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold text-[9px]">
-                    Keyless (No Keys Needed)
+                    Keyless Embed
                   </span>
                 </div>
-                <h3 className="text-base font-extrabold text-black dark:text-white font-serif mt-0.5">
-                  Import Spotify & Web Playlists
+                <h3 className="text-base font-bold text-[#292820] dark:text-[#E8E9DD] tracking-tight mt-0.5">
+                  Spotify Playlist Inspector & Downloader
                 </h3>
               </div>
             </div>
 
-            <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-              Paste any public Spotify playlist URL to instantly obtain its complete track list with zero API keys or user credentials required, then automatically locate matching audio recordings via <strong>Jamendo</strong> and the <strong>Internet Archive</strong>.
+            <p className="text-xs text-[#777267] dark:text-[#92998F] leading-relaxed">
+              Paste any public Spotify playlist URL to inspect every track before importing. Review metadata, skip duplicates, and download individual audio recordings directly.
             </p>
 
-            <div className="p-3.5 rounded-2xl bg-white dark:bg-black/60 border border-zinc-200 dark:border-zinc-800 text-[11px] space-y-1.5 text-zinc-600 dark:text-zinc-400">
-              <div className="flex items-center justify-between pb-1 border-b border-zinc-200 dark:border-zinc-800 font-semibold text-black dark:text-white">
-                <span>Architecture Compliance</span>
-                <span className="text-[#02ABB0]">Strict Standards</span>
-              </div>
-              <p>• <strong>X1 Source:</strong> Keyless Spotify embed metadata resolver. Automatically resolves titles, artists, duration, and order with 0 API keys.</p>
-              <p>• <strong>Anghami:</strong> Isolated interface cleanly marked unavailable due to lack of public keyless API.</p>
-              <p>• <strong>X2 Audio:</strong> Real downloadable audio from Jamendo & Internet Archive, with duplicate skipping and confidence score confirmation.</p>
-            </div>
+            {/* Quick URL Input Bar */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (spotifyUrlInput.trim()) {
+                  setIsSpotifyReviewOpen(true);
+                }
+              }}
+              className="flex gap-2"
+            >
+              <input
+                type="text"
+                value={spotifyUrlInput}
+                onChange={(e) => setSpotifyUrlInput(e.target.value)}
+                placeholder="https://open.spotify.com/playlist/..."
+                className="flex-1 px-3.5 py-2.5 rounded-xl bg-white/70 dark:bg-black/40 border border-[#292820]/15 dark:border-white/15 text-xs font-mono text-[#292820] dark:text-[#E8E9DD] placeholder:text-[#777267] focus:outline-none focus:border-emerald-500"
+              />
+              <button
+                type="submit"
+                disabled={!spotifyUrlInput.trim()}
+                className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold active:scale-95 transition shrink-0 disabled:opacity-50 flex items-center gap-1.5"
+              >
+                <Search className="w-3.5 h-3.5" />
+                <span>Inspect</span>
+              </button>
+            </form>
 
             <button
-              onClick={() => setIsImportModalOpen(true)}
-              className="w-full py-3.5 rounded-2xl bg-[#02ABB0] hover:bg-[#01A4BD] text-black text-xs font-extrabold flex items-center justify-center gap-2 shadow-lg shadow-[#02ABB0]/25 transition active:scale-95"
+              onClick={() => setIsSpotifyReviewOpen(true)}
+              className="w-full py-3 rounded-2xl bg-white/60 dark:bg-black/30 hover:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-xs font-bold flex items-center justify-center gap-2 active:scale-95 transition"
             >
-              <Download className="w-4 h-4" />
-              <span>Launch Playlist Import Wizard</span>
+              <ListMusic className="w-4 h-4" />
+              <span>Open Spotify Playlist Inspector</span>
+            </button>
+          </div>
+
+          {/* 2. UNIFIED SEARCH & TELEGRAM HUB GRID */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Telegram Music Hub */}
+            <div className="p-4 rounded-3xl bg-[#E8DDC9]/50 dark:bg-[#141815]/60 border border-[#292820]/10 dark:border-white/10 space-y-2.5">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-[#02ABB0]/20 text-[#02ABB0] flex items-center justify-center shrink-0">
+                  <Send className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-[#292820] dark:text-[#E8E9DD]">
+                    Telegram Music Hub
+                  </h4>
+                  <p className="text-[11px] text-[#777267] dark:text-[#92998F]">
+                    {botInfo ? `@${botInfo.username} connected` : 'Optional bot & channel sync'}
+                  </p>
+                </div>
+              </div>
+              <p className="text-[11px] text-[#777267] dark:text-[#92998F] leading-tight">
+                Preview discoverable tracks without a token or connect your bot to sync audio files.
+              </p>
+              <button
+                onClick={() => setIsTelegramDiscoveryOpen(true)}
+                className="w-full py-2 rounded-xl bg-[#02ABB0]/15 hover:bg-[#02ABB0]/25 text-[#02ABB0] text-xs font-bold transition active:scale-95 flex items-center justify-center gap-1.5"
+              >
+                <Send className="w-3.5 h-3.5" />
+                <span>Open Telegram Hub</span>
+              </button>
+            </div>
+
+            {/* Persistent Music History */}
+            <div className="p-4 rounded-3xl bg-[#E8DDC9]/50 dark:bg-[#141815]/60 border border-[#292820]/10 dark:border-white/10 space-y-2.5">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-[#176B67]/20 text-[#176B67] dark:bg-[#C8F169]/20 dark:text-[#C8F169] flex items-center justify-center shrink-0">
+                  <History className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-[#292820] dark:text-[#E8E9DD]">
+                    Music & Import History
+                  </h4>
+                  <p className="text-[11px] text-[#777267] dark:text-[#92998F]">
+                    Persistent searches, downloads & retries
+                  </p>
+                </div>
+              </div>
+              <p className="text-[11px] text-[#777267] dark:text-[#92998F] leading-tight">
+                Re-open past Spotify playlists, re-run searches, and retry failed imports with backoff.
+              </p>
+              <button
+                onClick={() => setIsHistoryModalOpen(true)}
+                className="w-full py-2 rounded-xl bg-[#176B67]/15 dark:bg-[#C8F169]/15 text-[#176B67] dark:text-[#C8F169] text-xs font-bold transition active:scale-95 flex items-center justify-center gap-1.5"
+              >
+                <History className="w-3.5 h-3.5" />
+                <span>View Complete History</span>
+              </button>
+            </div>
+          </div>
+
+          {/* 3. ADVANCED BATCH IMPORT WIZARD */}
+          <div className="p-3.5 rounded-2xl bg-white/40 dark:bg-black/20 border border-[#292820]/10 dark:border-white/10 flex items-center justify-between">
+            <div>
+              <h5 className="text-xs font-bold text-[#292820] dark:text-[#E8E9DD]">
+                Advanced Batch Import Wizard
+              </h5>
+              <p className="text-[11px] text-[#777267] dark:text-[#92998F]">
+                Multi-provider automated matching with threshold sliders
+              </p>
+            </div>
+            <button
+              onClick={() => setIsImportModalOpen(true)}
+              className="px-3 py-1.5 rounded-xl bg-[#292820]/10 dark:bg-white/10 hover:bg-[#176B67] hover:text-white dark:hover:bg-[#C8F169] dark:hover:text-[#080A09] text-xs font-semibold active:scale-95 transition"
+            >
+              Launch Wizard
             </button>
           </div>
         </div>
@@ -978,10 +1081,33 @@ export const SyncScreen: React.FC<SyncScreenProps> = ({ fileInputRef }) => {
         </div>
       )}
 
-      {/* Playlist Import Modal */}
+      {/* Playlist Import Modal (Advanced Engine) */}
       <PlaylistImportModal
         isOpen={isImportModalOpen}
         onClose={() => setIsImportModalOpen(false)}
+      />
+
+      {/* Spotify Playlist Review & Track Downloader Modal */}
+      <SpotifyPlaylistReviewModal
+        isOpen={isSpotifyReviewOpen}
+        onClose={() => setIsSpotifyReviewOpen(false)}
+        initialUrl={spotifyUrlInput}
+      />
+
+      {/* Telegram Discovery & Bot Updates Modal */}
+      <TelegramDiscoveryModal
+        isOpen={isTelegramDiscoveryOpen}
+        onClose={() => setIsTelegramDiscoveryOpen(false)}
+      />
+
+      {/* Persistent Music & Import History Modal */}
+      <MusicHistoryModal
+        isOpen={isHistoryModalOpen}
+        onClose={() => setIsHistoryModalOpen(false)}
+        onSelectPlaylistUrl={(url) => {
+          setSpotifyUrlInput(url);
+          setIsSpotifyReviewOpen(true);
+        }}
       />
     </div>
   );
