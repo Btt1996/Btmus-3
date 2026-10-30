@@ -154,6 +154,10 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const isCrossfadingRef = useRef(false);
   const originalQueueRef = useRef<Track[]>([]);
 
+  // Silent keep-alive PCM WAV loop URI (keeps iOS audio session and JS event loops active in background)
+  const SILENT_AUDIO_URI = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+  const silentKeepAliveRef = useRef<HTMLAudioElement | null>(null);
+
   // Web Audio for iOS In-App Volume & 3x Booster
   const audioCtxRef = useRef<AudioContext | null>(null);
   const masterGainRef = useRef<GainNode | null>(null);
@@ -172,100 +176,56 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }, 3200);
   }, []);
 
-  // Initialize or resume Web Audio Graph
+  // Safe audio engine keeper — ensures background silent audio is running when music plays
   const ensureWebAudio = useCallback(() => {
-    try {
-      if (!audioCtxRef.current) {
-        const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-        if (!AudioCtx) return;
-        const ctx = new AudioCtx();
-        audioCtxRef.current = ctx;
-
-        const masterGain = ctx.createGain();
-        const compressor = ctx.createDynamicsCompressor();
-        
-        // Studio-grade zero-clipping limiter settings
-        compressor.threshold.setValueAtTime(-10, ctx.currentTime);
-        compressor.knee.setValueAtTime(24, ctx.currentTime);
-        compressor.ratio.setValueAtTime(12, ctx.currentTime);
-        compressor.attack.setValueAtTime(0.003, ctx.currentTime);
-        compressor.release.setValueAtTime(0.25, ctx.currentTime);
-
-        masterGain.connect(compressor);
-        compressor.connect(ctx.destination);
-        masterGainRef.current = masterGain;
-        compressorRef.current = compressor;
-
-        if (deckARef.current && !deckGainARef.current) {
-          try {
-            const srcA = ctx.createMediaElementSource(deckARef.current);
-            const gainA = ctx.createGain();
-            gainA.gain.setValueAtTime(1.0, ctx.currentTime);
-            srcA.connect(gainA);
-            gainA.connect(masterGain);
-            deckGainARef.current = gainA;
-          } catch (e) {
-            console.warn('Could not connect deckA to WebAudio:', e);
-          }
-        }
-
-        if (deckBRef.current && !deckGainBRef.current) {
-          try {
-            const srcB = ctx.createMediaElementSource(deckBRef.current);
-            const gainB = ctx.createGain();
-            gainB.gain.setValueAtTime(0.0, ctx.currentTime);
-            srcB.connect(gainB);
-            gainB.connect(masterGain);
-            deckGainBRef.current = gainB;
-          } catch (e) {
-            console.warn('Could not connect deckB to WebAudio:', e);
-          }
-        }
-
-        isWebAudioSetupRef.current = true;
-      }
-
-      if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
-        audioCtxRef.current.resume().catch(console.warn);
-      }
-    } catch (e) {
-      console.warn('Web Audio init exception:', e);
+    if (silentKeepAliveRef.current && silentKeepAliveRef.current.paused && playerStateRef.current.isPlaying) {
+      silentKeepAliveRef.current.play().catch(() => {});
     }
   }, []);
 
-  // Calculate and apply gain to master Web Audio node
+  // Calculate and apply direct volume to audio elements without breaking background playback
   const applyMasterGain = useCallback(
-    (vol?: number, booster?: number, isBooster?: boolean, muted?: boolean) => {
-      if (!masterGainRef.current || !audioCtxRef.current) return;
+    (vol?: number, _booster?: number, _isBooster?: boolean, muted?: boolean) => {
       const v = vol !== undefined ? vol : playerStateRef.current.volume;
-      const b = booster !== undefined ? booster : playerStateRef.current.volumeBooster;
-      const active = isBooster !== undefined ? isBooster : playerStateRef.current.isBoosterActive;
       const isM = muted !== undefined ? muted : playerStateRef.current.isMuted;
+      const targetVol = isM ? 0 : Math.max(0, Math.min(1, v));
 
-      const effectiveMultiplier = active ? Math.max(1.0, Math.min(3.0, b)) : 1.0;
-      const targetGain = isM ? 0 : v * effectiveMultiplier;
-
-      try {
-        const now = audioCtxRef.current.currentTime;
-        masterGainRef.current.gain.cancelScheduledValues(now);
-        masterGainRef.current.gain.setTargetAtTime(targetGain, now, 0.02);
-      } catch (e) {
-        console.warn('Error setting master gain:', e);
+      const activeDeck = activeDeckRef.current === 'A' ? deckARef.current : deckBRef.current;
+      if (activeDeck) {
+        activeDeck.volume = targetVol;
       }
     },
     []
   );
 
-  // Initialize Audio Elements
+  // Initialize Audio Elements & Background Resilience
   useEffect(() => {
-    const deckA = new Audio();
-    const deckB = new Audio();
+    // If DOM elements were mounted, reuse them; otherwise instantiate fallback
+    const deckA = deckARef.current || new Audio();
+    const deckB = deckBRef.current || new Audio();
 
     deckA.preload = 'auto';
     deckB.preload = 'auto';
+    deckA.setAttribute('playsinline', 'true');
+    deckB.setAttribute('playsinline', 'true');
+    deckA.setAttribute('webkit-playsinline', 'true');
+    deckB.setAttribute('webkit-playsinline', 'true');
+    deckA.setAttribute('x-webkit-airplay', 'allow');
+    deckB.setAttribute('x-webkit-airplay', 'allow');
 
     deckARef.current = deckA;
     deckBRef.current = deckB;
+
+    let silentAudio = silentKeepAliveRef.current;
+    if (!silentAudio) {
+      silentAudio = new Audio(SILENT_AUDIO_URI);
+      silentKeepAliveRef.current = silentAudio;
+    }
+    silentAudio.loop = true;
+    silentAudio.volume = 0.001;
+    silentAudio.preload = 'auto';
+    silentAudio.setAttribute('playsinline', 'true');
+    silentAudio.setAttribute('webkit-playsinline', 'true');
 
     const attachDeckListeners = (deck: HTMLAudioElement, deckId: 'A' | 'B') => {
       const handleTimeUpdate = () => {
@@ -309,6 +269,9 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (activeDeckRef.current === deckId) {
           setPlayerState((prev) => ({ ...prev, isPlaying: true }));
           if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
+          if (silentKeepAliveRef.current && silentKeepAliveRef.current.paused) {
+            silentKeepAliveRef.current.play().catch(() => {});
+          }
         }
       };
 
@@ -316,6 +279,9 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (activeDeckRef.current === deckId && !isCrossfadingRef.current) {
           setPlayerState((prev) => ({ ...prev, isPlaying: false }));
           if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
+          if (silentKeepAliveRef.current && !silentKeepAliveRef.current.paused) {
+            silentKeepAliveRef.current.pause();
+          }
         }
       };
 
@@ -364,15 +330,17 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const cleanupB = attachDeckListeners(deckB, 'B');
 
     // iOS PWA Background Resilience:
-    // When returning from background or lock screen, resume Web Audio if suspended and resync
+    // When returning from background or lock screen, resync position.
+    // When hidden, ensure silent keep-alive loop remains active so iOS doesn't suspend audio session.
     const handleVisibilityChange = () => {
+      const activeDeck = activeDeckRef.current === 'A' ? deckA : deckB;
       if (document.visibilityState === 'visible') {
-        if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
-          audioCtxRef.current.resume().catch(console.warn);
-        }
-        const activeDeck = activeDeckRef.current === 'A' ? deckA : deckB;
         if (activeDeck && !activeDeck.paused) {
           updateMediaSessionPosition(activeDeck);
+        }
+      } else {
+        if (playerStateRef.current.isPlaying && silentKeepAliveRef.current && silentKeepAliveRef.current.paused) {
+          silentKeepAliveRef.current.play().catch(() => {});
         }
       }
     };
@@ -384,6 +352,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       deckA.pause();
       deckB.pause();
+      if (silentKeepAliveRef.current) silentKeepAliveRef.current.pause();
       if (activeUrlARef.current) URL.revokeObjectURL(activeUrlARef.current);
       if (activeUrlBRef.current) URL.revokeObjectURL(activeUrlBRef.current);
       preloadedUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
@@ -397,7 +366,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Show Next (⏭) and Previous (⏮) controls on iPhone lock screen / screen off, NOT +10 and -10.
   // In iOS WebKit/Safari, registering 'seekbackward' or 'seekforward' forces iOS to display
   // +10 and -10 skip buttons instead of track skip buttons.
-  // We explicitly clear seekbackward and seekforward to null, and use mutable refs for action
+  // We NEVER register seekbackward or seekforward, and use mutable refs for action
   // handlers so lock-screen interactions always invoke the freshest queue logic.
   const setupMediaSession = useCallback((track: Track) => {
     if (!('mediaSession' in navigator)) return;
@@ -419,24 +388,21 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     navigator.mediaSession.setActionHandler('play', () => {
       const activeDeck = activeDeckRef.current === 'A' ? deckARef.current : deckBRef.current;
       if (activeDeck && activeDeck.paused) {
-        activeDeck.play().catch(console.warn);
+        activeDeck.play().then(() => {
+          if (silentKeepAliveRef.current && silentKeepAliveRef.current.paused) {
+            silentKeepAliveRef.current.play().catch(() => {});
+          }
+        }).catch(console.warn);
       }
     });
 
     navigator.mediaSession.setActionHandler('pause', () => {
       const activeDeck = activeDeckRef.current === 'A' ? deckARef.current : deckBRef.current;
       activeDeck?.pause();
+      if (silentKeepAliveRef.current && !silentKeepAliveRef.current.paused) {
+        silentKeepAliveRef.current.pause();
+      }
     });
-
-    // CRITICAL iOS Lock Screen Requirement:
-    // When seekbackward or seekforward are registered, iOS replaces ⏭ and ⏮ with 10s skip buttons.
-    // Explicitly setting them to null forces iOS to display the native Previous (⏮) and Next (⏭) controls!
-    try {
-      navigator.mediaSession.setActionHandler('seekbackward', null);
-      navigator.mediaSession.setActionHandler('seekforward', null);
-    } catch {
-      // ignore
-    }
 
     // Previous Track on Lock Screen & AirPods
     try {
@@ -487,9 +453,20 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const preloadQueueTracks = useCallback(async (currentIndex: number, queue: Track[]) => {
     if (!queue || queue.length === 0) return;
     const indicesToPreload: number[] = [];
-    if (currentIndex + 1 < queue.length) indicesToPreload.push(currentIndex + 1);
-    else if (queue.length > 1) indicesToPreload.push(0); // loop
+
+    // Aggressively preload next 3 tracks and wrap around for instant background skipping
+    for (let offset = 1; offset <= 3; offset++) {
+      const nextIdx = currentIndex + offset;
+      if (nextIdx < queue.length) {
+        indicesToPreload.push(nextIdx);
+      } else if (queue.length > 1) {
+        indicesToPreload.push((currentIndex + offset) % queue.length);
+      }
+    }
+
+    // Also preload previous track
     if (currentIndex - 1 >= 0) indicesToPreload.push(currentIndex - 1);
+    else if (queue.length > 1) indicesToPreload.push(queue.length - 1);
 
     const neededIds = new Set(indicesToPreload.map((i) => queue[i]?.id).filter(Boolean));
     if (queue[currentIndex]?.id) neededIds.add(queue[currentIndex].id);
@@ -507,10 +484,14 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const track = queue[idx];
       if (!track || preloadedUrlsRef.current.has(track.id)) continue;
       try {
-        const blob = await db.getAudioBlob(track.id);
-        if (blob) {
-          const url = URL.createObjectURL(blob);
-          preloadedUrlsRef.current.set(track.id, url);
+        if (track.previewUrl) {
+          preloadedUrlsRef.current.set(track.id, track.previewUrl);
+        } else {
+          const blob = await db.getAudioBlob(track.id);
+          if (blob) {
+            const url = URL.createObjectURL(blob);
+            preloadedUrlsRef.current.set(track.id, url);
+          }
         }
       } catch (err) {
         console.warn('Preload audio error for', track.id, err);
@@ -714,7 +695,11 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       // End of queue reached
       activeDeck.pause();
       activeDeck.currentTime = 0;
+      if (silentKeepAliveRef.current && !silentKeepAliveRef.current.paused) {
+        silentKeepAliveRef.current.pause();
+      }
       setPlayerState((prev) => ({ ...prev, isPlaying: false, currentTime: 0 }));
+      if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
       return;
     }
 
@@ -726,7 +711,11 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       activeDeck.src = cachedUrl;
       activeDeck.currentTime = 0;
       activeDeck.playbackRate = playerStateRef.current.playbackRate;
-      activeDeck.play().catch(console.warn);
+      activeDeck.play().then(() => {
+        if (silentKeepAliveRef.current && silentKeepAliveRef.current.paused) {
+          silentKeepAliveRef.current.play().catch(() => {});
+        }
+      }).catch(console.warn);
 
       const targetTrack = nextTrackToPlay;
       setPlayerState((prev) => ({
@@ -796,7 +785,11 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       activeDeck.src = cachedUrl;
       activeDeck.currentTime = 0;
       activeDeck.playbackRate = playerStateRef.current.playbackRate;
-      activeDeck.play().catch(console.warn);
+      activeDeck.play().then(() => {
+        if (silentKeepAliveRef.current && silentKeepAliveRef.current.paused) {
+          silentKeepAliveRef.current.play().catch(() => {});
+        }
+      }).catch(console.warn);
 
       setPlayerState((prev) => ({
         ...prev,
@@ -839,8 +832,15 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     if (playerStateRef.current.isPlaying) {
       activeDeck.pause();
+      if (silentKeepAliveRef.current && !silentKeepAliveRef.current.paused) {
+        silentKeepAliveRef.current.pause();
+      }
     } else {
-      activeDeck.play().catch((err) => {
+      activeDeck.play().then(() => {
+        if (silentKeepAliveRef.current && silentKeepAliveRef.current.paused) {
+          silentKeepAliveRef.current.play().catch(() => {});
+        }
+      }).catch((err) => {
         console.warn('Audio resume error:', err);
         showToast('Could not resume audio');
       });
@@ -1520,6 +1520,29 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         optimizePlaylistHarmonically,
       }}
     >
+      {/* iOS CoreAudio Persistent Anchor Elements */}
+      <div style={{ display: 'none' }} aria-hidden="true">
+        <audio
+          ref={(el) => {
+            if (el) deckARef.current = el;
+          }}
+          preload="auto"
+        />
+        <audio
+          ref={(el) => {
+            if (el) deckBRef.current = el;
+          }}
+          preload="auto"
+        />
+        <audio
+          ref={(el) => {
+            if (el) silentKeepAliveRef.current = el;
+          }}
+          loop
+          preload="auto"
+          src={SILENT_AUDIO_URI}
+        />
+      </div>
       {children}
     </MusicContext.Provider>
   );
