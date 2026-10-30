@@ -228,12 +228,12 @@ export const FullScreenPlayer: React.FC = () => {
             <ChevronDown className="w-5 h-5" />
           </button>
 
-          {/* Discreet Branding: bttm By Ahmed Taboubi */}
+          {/* Discreet Branding: btmu by Ahmed */}
           <div className="text-center flex flex-col items-center">
-            <span className="text-[10.5px] font-mono tracking-widest uppercase font-black text-[#176B67] dark:text-[#C8F169]">
-              BttM <span className="lowercase font-normal tracking-normal text-[#777267] dark:text-[#92998F]">By</span> Ahmed Taboubi
+            <span className="text-[11px] font-mono tracking-widest uppercase font-black text-[var(--btt-accent)]">
+              btmu <span className="lowercase font-normal tracking-normal text-[var(--btt-card-subtext)]">by</span> Ahmed
             </span>
-            <span className="text-[9px] font-mono text-[#777267] dark:text-[#92998F] font-bold">
+            <span className="text-[9px] font-mono text-[var(--btt-card-subtext)] font-bold">
               NOW PLAYING
             </span>
           </div>
@@ -244,10 +244,10 @@ export const FullScreenPlayer: React.FC = () => {
               onClick={() => setIsSmartMixOpen(true)}
               className={`p-2.5 rounded-full backdrop-blur-xl border transition active:scale-90 ${
                 smartMixConfig.enabled
-                  ? 'bg-[#C8F169]/30 text-[#176B67] dark:text-[#C8F169] border-[#176B67]/30 dark:border-[#C8F169]/50 shadow-xs'
-                  : 'bg-[#E8DDC9]/80 dark:bg-[#141815]/80 text-[#777267] dark:text-[#92998F] border-[#292820]/10 dark:border-white/10'
+                  ? 'bg-[var(--btt-accent)]/30 text-[var(--btt-accent)] border-[var(--btt-accent)]/50 shadow-xs'
+                  : 'bg-[var(--btt-surface)] text-[var(--btt-card-subtext)] border-[var(--btt-border)]'
               }`}
-              title="Btt Smart Mix"
+              title="Smart Mix"
             >
               <Sparkles className="w-4 h-4" />
             </button>
@@ -300,7 +300,7 @@ export const FullScreenPlayer: React.FC = () => {
                 ) : (
                   <img
                     src="/app-logo.png"
-                    alt="BttM"
+                    alt="btmu"
                     className="w-full h-full object-cover select-none"
                   />
                 )}
@@ -430,7 +430,7 @@ export const FullScreenPlayer: React.FC = () => {
               )}
             </div>
 
-            <div className="flex items-center justify-between text-xs font-mono font-bold text-[#777267] dark:text-[#92998F]">
+            <div className="flex items-center justify-between text-xs font-mono font-bold text-[#777267] dark:text-[#92998F] tabular-nums">
               <span className={isDraggingSeek ? 'text-[#176B67] dark:text-[#C8F169]' : ''}>
                 {formatDuration(displayTime)}
               </span>

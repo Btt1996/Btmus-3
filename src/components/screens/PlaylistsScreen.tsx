@@ -48,10 +48,10 @@ export const PlaylistsScreen: React.FC<PlaylistsScreenProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <div className="text-[10px] uppercase tracking-widest text-[#176B67] dark:text-[#C8F169] font-black font-mono">
-            bttm By Ahmed Taboubi
+          <div className="text-[10px] uppercase tracking-widest text-[var(--btt-accent)] font-black font-mono">
+            btmu by Ahmed
           </div>
-          <h1 className="text-2xl font-black text-[#292820] dark:text-[#E8E9DD] tracking-tight">
+          <h1 className="text-2xl font-black text-[var(--btt-card-text)] tracking-tight font-display">
             Playlists
           </h1>
           <p className="text-xs text-[#777267] dark:text-[#92998F] mt-0.5">

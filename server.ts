@@ -14,11 +14,11 @@ app.use(express.json());
 app.get('/api/version', (_req, res) => {
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.json({
-    name: 'bttm By Ahmed Taboubi',
-    version: '1.7.0',
-    buildDate: '2026-10-25',
+    name: 'btmu by Ahmed',
+    version: '1.8.0',
+    buildDate: '2026-10-30',
     releaseNotes:
-      'Btt Music 1.7.0: Native Apple SF Pro system typography; New modular X2 audio retrieval architecture with verified local IndexedDB cache, Telegram Hub music synchronizer (Musics Hunter model), Free Music Archive (FMA), enhanced Jamendo v2 and Internet Archive v2 fallback providers; comprehensive 6-point spotDL technical investigation; live real track diagnostic benchmark suite; and resilient per-track failure recovery.',
+      'btmu 1.8.0: Official btmu by Ahmed rebrand with new identity logo and fluid spring splash screen; Signature navy, gold & cyan design system with Mono and Legacy palette combos; reliable iOS background audio playback; unified music search across Spotify, YouTube, SoundCloud & Telegram; and ultra-smooth liquid UI transitions.',
     minSupportedVersion: '1.0.0',
   });
 });

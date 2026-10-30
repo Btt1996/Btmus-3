@@ -79,10 +79,10 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab })
             })}
           </div>
 
-          {/* Discreet Footer Signature: bttm By Ahmed Taboubi */}
+          {/* Discreet Footer Signature: btmu by Ahmed */}
           <div className="pt-0.5 pb-0.5 text-center">
-            <span className="text-[9px] tracking-widest uppercase font-mono text-[#777267]/75 dark:text-[#92998F]/70 font-semibold select-none">
-              bttm <span className="lowercase font-normal tracking-normal text-[#777267]/60 dark:text-[#92998F]/60">By</span> Ahmed Taboubi
+            <span className="text-[9px] tracking-widest uppercase font-mono text-[var(--btt-card-subtext)] opacity-75 font-semibold select-none">
+              btmu <span className="lowercase font-normal tracking-normal text-[var(--btt-card-subtext)]/60">by</span> Ahmed
             </span>
           </div>
         </div>

@@ -200,23 +200,19 @@ export const VolumeControl: React.FC<VolumeControlProps> = ({
           </span>
         </div>
 
-        {/* Booster Mode Toggle Button */}
+        {/* Booster Mode Toggle Button (Disabled for background stability) */}
         <button
           type="button"
           onClick={() => toggleVolumeBooster()}
-          className={`px-2.5 py-1 rounded-xl text-xs font-bold font-mono transition flex items-center gap-1 active:scale-95 border ${
-            isBoosterActive
-              ? 'bg-black text-white dark:bg-white dark:text-black border-black dark:border-white shadow-sm'
-              : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:text-black dark:hover:text-white'
-          }`}
-          title={isBoosterActive ? 'Disable Volume Booster' : 'Enable 3x Volume Booster'}
+          className="px-2.5 py-1 rounded-xl text-xs font-bold font-mono transition flex items-center gap-1 opacity-60 cursor-not-allowed bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700"
+          title="Disabled for background stability"
         >
-          <Zap className={`w-3.5 h-3.5 ${isBoosterActive ? 'fill-current' : ''}`} />
-          <span>3x Boost</span>
+          <Zap className="w-3.5 h-3.5" />
+          <span>Booster Off</span>
         </button>
       </div>
 
-      {/* Quick Volume & Booster Presets Row */}
+      {/* Volume Presets Row */}
       {showPresets && (
         <div className="flex items-center justify-between gap-1.5 pt-0.5">
           <span className="text-[10px] uppercase font-bold tracking-wider text-zinc-500 dark:text-zinc-400">
@@ -226,49 +222,54 @@ export const VolumeControl: React.FC<VolumeControlProps> = ({
           <div className="flex items-center gap-1">
             <button
               type="button"
-              onClick={() => handlePresetClick(1.0)}
+              onClick={() => setVolume(0.25)}
               className={`px-2.5 py-0.5 rounded-lg text-[10px] font-mono font-bold transition ${
-                !isBoosterActive || (volume >= 0.95 && volumeBooster <= 1.05)
+                Math.abs(volume - 0.25) < 0.05
                   ? 'bg-black text-white dark:bg-white dark:text-black'
                   : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white'
               }`}
             >
-              1.0x
+              25%
             </button>
             <button
               type="button"
-              onClick={() => handlePresetClick(1.5)}
+              onClick={() => setVolume(0.5)}
               className={`px-2.5 py-0.5 rounded-lg text-[10px] font-mono font-bold transition ${
-                isBoosterActive && Math.abs(volumeBooster - 1.5) < 0.1
+                Math.abs(volume - 0.5) < 0.05
                   ? 'bg-black text-white dark:bg-white dark:text-black'
                   : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white'
               }`}
             >
-              1.5x
+              50%
             </button>
             <button
               type="button"
-              onClick={() => handlePresetClick(2.0)}
+              onClick={() => setVolume(0.75)}
               className={`px-2.5 py-0.5 rounded-lg text-[10px] font-mono font-bold transition ${
-                isBoosterActive && Math.abs(volumeBooster - 2.0) < 0.1
+                Math.abs(volume - 0.75) < 0.05
                   ? 'bg-black text-white dark:bg-white dark:text-black'
                   : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white'
               }`}
             >
-              2.0x
+              75%
             </button>
             <button
               type="button"
-              onClick={() => handlePresetClick(3.0)}
-              className={`px-2.5 py-0.5 rounded-lg text-[10px] font-mono font-extrabold transition flex items-center gap-0.5 ${
-                isBoosterActive && Math.abs(volumeBooster - 3.0) < 0.1
+              onClick={() => setVolume(1.0)}
+              className={`px-2.5 py-0.5 rounded-lg text-[10px] font-mono font-bold transition ${
+                volume >= 0.98
                   ? 'bg-black text-white dark:bg-white dark:text-black'
-                  : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-300 dark:border-zinc-700 hover:text-black dark:hover:text-white'
+                  : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white'
               }`}
             >
-              <Zap className="w-2.5 h-2.5 fill-current" />
-              <span>3.0x MAX</span>
+              100%
             </button>
+            <span
+              className="text-[9px] font-mono text-zinc-400 dark:text-zinc-500 pl-1"
+              title="3x Booster disabled for background playback stability"
+            >
+              (Direct output)
+            </span>
           </div>
         </div>
       )}

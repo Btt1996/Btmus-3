@@ -352,8 +352,8 @@ export const SyncScreen: React.FC<SyncScreenProps> = ({ fileInputRef }) => {
         try {
           await navigator.share({
             files: [new File([blob], filename, { type: 'application/json' })],
-            title: 'Btt Music Database',
-            text: 'Here is my Btt Music library backup.',
+            title: 'btmu Database',
+            text: 'Here is my btmu library backup.',
           });
           showToast('Shared database successfully!');
           return;
@@ -423,11 +423,11 @@ export const SyncScreen: React.FC<SyncScreenProps> = ({ fileInputRef }) => {
 
       {/* Screen Title */}
       <div>
-        <div className="text-[10px] uppercase tracking-widest text-[#02ABB0] font-black font-serif">
-          bttm By Ahmed Taboubi
+        <div className="text-[10px] uppercase tracking-widest text-[var(--btt-accent)] font-black font-mono">
+          btmu by Ahmed
         </div>
-        <h1 className="text-2xl font-extrabold text-black dark:text-white tracking-tight font-serif">Sync & Import</h1>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 font-serif">
+        <h1 className="text-2xl font-extrabold text-black dark:text-white tracking-tight font-display">Sync & Import</h1>
+        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
           Import playlists from Spotify, sync music from Telegram, or manage your offline database.
         </p>
       </div>
@@ -688,7 +688,7 @@ export const SyncScreen: React.FC<SyncScreenProps> = ({ fileInputRef }) => {
             </div>
 
             <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800 text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed">
-              <strong>How it works:</strong> Create a bot with @BotFather on Telegram. Add your bot as an admin to your music channel/chat, or forward music to your bot. Btt Music reads the audio updates and downloads them straight into your iPhone local storage!
+              <strong>How it works:</strong> Create a bot with @BotFather on Telegram. Add your bot as an admin to your music channel/chat, or forward music to your bot. btmu reads the audio updates and downloads them straight into your iPhone local storage!
             </div>
           </div>
 
@@ -1050,7 +1050,7 @@ export const SyncScreen: React.FC<SyncScreenProps> = ({ fileInputRef }) => {
               <span>Privacy & Telegram Architecture</span>
             </div>
             <p className="leading-relaxed text-zinc-600 dark:text-zinc-400">
-              Btt Music was architected with privacy and iOS offline-first capabilities as top priorities:
+              btmu was architected with privacy and iOS offline-first capabilities as top priorities:
             </p>
             <ul className="space-y-2 list-disc list-inside text-zinc-700 dark:text-zinc-300">
               <li>
@@ -1073,7 +1073,7 @@ export const SyncScreen: React.FC<SyncScreenProps> = ({ fileInputRef }) => {
               IndexedDB on iOS supports hundreds of gigabytes depending on your iPhone's free storage. To keep music cached permanently:
             </p>
             <ol className="space-y-1.5 list-decimal list-inside text-zinc-700 dark:text-zinc-300">
-              <li>Add Btt Music to your Home Screen from Safari.</li>
+              <li>Add btmu to your Home Screen from Safari.</li>
               <li>Open the app periodically to keep Safari’s persistent storage flag active.</li>
               <li>Check the Settings screen to monitor storage usage and export library metadata backups anytime.</li>
             </ol>

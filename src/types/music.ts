@@ -132,5 +132,6 @@ export interface AppSettings {
   smartMix: SmartMixConfig;
   volumeBooster: number; // 1.0 to 3.0
   isBoosterActive: boolean;
+  paletteCombo?: 'signature' | 'mono' | 'legacy';
   lastSyncedAt?: number;
 }

@@ -6,6 +6,7 @@ import { FullScreenPlayer } from './components/player/FullScreenPlayer';
 import { HomeScreen } from './components/screens/HomeScreen';
 import { LibraryScreen } from './components/screens/LibraryScreen';
 import { Toast } from './components/common/Toast';
+import { SplashScreen } from './components/common/SplashScreen';
 import { parseAudioMetadata } from './utils/id3Parser';
 import { saveTrack, savePlaylist } from './services/db';
 import { Track, Playlist } from './types/music';
@@ -28,10 +29,10 @@ const SettingsScreen = React.lazy(() =>
 function ScreenLoadingFallback() {
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-8 min-h-[50vh] text-center select-none">
-      <div className="w-12 h-12 rounded-2xl bg-[#E8DDC9]/70 dark:bg-[#141815]/70 border border-[#176B67]/20 dark:border-[#C8F169]/30 flex items-center justify-center animate-pulse shadow-sm mb-3">
-        <div className="w-5 h-5 rounded-full border-2 border-[#176B67] dark:border-[#C8F169] border-t-transparent animate-spin" />
+      <div className="w-12 h-12 rounded-2xl bg-[#DFE8F2]/70 dark:bg-[#0E1726]/70 border border-[#0E8B9C]/20 dark:border-[#24C7DB]/30 flex items-center justify-center animate-pulse shadow-sm mb-3">
+        <div className="w-5 h-5 rounded-full border-2 border-[#0E8B9C] dark:border-[#24C7DB] border-t-transparent animate-spin" />
       </div>
-      <p className="text-xs font-mono uppercase tracking-wider text-[#777267] dark:text-[#92998F]">
+      <p className="text-xs font-mono uppercase tracking-wider text-[#52657A] dark:text-[#7E8F9E]">
         Loading screen...
       </p>
     </div>
@@ -39,6 +40,7 @@ function ScreenLoadingFallback() {
 }
 
 function MainLayout() {
+  const [showSplash, setShowSplash] = useState(true);
   const [currentTab, setCurrentTab] = useState<TabType | 'playlists' | 'sync' | 'settings' | 'search'>('home');
   const [selectedPlaylistId, setSelectedPlaylistId] = useState<string | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -66,9 +68,15 @@ function MainLayout() {
     }
   }, [isDarkMode]);
 
+  // Sync palette combo to documentElement
+  useEffect(() => {
+    const palette = settings.paletteCombo || 'signature';
+    document.documentElement.setAttribute('data-palette', palette);
+  }, [settings.paletteCombo]);
+
   const toggleTheme = () => {
     setIsDarkMode((prev) => !prev);
-    showToast(!isDarkMode ? 'Dark Mode enabled' : 'Champagne Light Mode enabled');
+    showToast(!isDarkMode ? 'Dark Mode enabled' : 'Light Mode enabled');
   };
 
   const handleGlobalFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -141,7 +149,10 @@ function MainLayout() {
   };
 
   return (
-    <div className="min-h-screen min-h-[100dvh] bg-[#F3EBDD] dark:bg-[#080A09] text-[#292820] dark:text-[#E8E9DD] flex flex-col justify-between selection:bg-[#C8F169] selection:text-[#292820] dark:selection:bg-[#C8F169] dark:selection:text-[#080A09] transition-colors duration-300">
+    <div className="min-h-screen min-h-[100dvh] bg-[#EEF3F8] dark:bg-[#070E1A] text-[#0A131F] dark:text-[#F0F4FA] flex flex-col justify-between selection:bg-[#E5B842] selection:text-[#070E1A] dark:selection:bg-[#E5B842] dark:selection:text-[#070E1A] transition-colors duration-300">
+      {/* Cold-Start Fast Fluid SplashScreen (dismissed on 1s timer, app renders underneath) */}
+      {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
+
       {/* Hidden Global Audio File Input */}
       <input
         ref={fileInputRef}
@@ -152,15 +163,15 @@ function MainLayout() {
         className="hidden"
       />
 
-      {/* iOS Liquid Glass Top Header Bar: bttm By Ahmed Taboubi */}
-      <header className="sticky top-0 z-30 pt-safe bg-[#E8DDC9]/80 dark:bg-[#141815]/85 backdrop-blur-3xl border-b border-[#292820]/10 dark:border-white/10 px-4 py-2.5 flex items-center justify-between select-none transition-colors">
+      {/* iOS Liquid Glass Top Header Bar: btmu by Ahmed */}
+      <header className="sticky top-0 z-30 pt-safe bg-[#DFE8F2]/80 dark:bg-[#0E1726]/85 backdrop-blur-3xl border-b border-[#0A131F]/10 dark:border-white/10 px-4 py-2.5 flex items-center justify-between select-none transition-colors">
         <div className="flex items-center gap-2.5">
-          <div className="w-6 h-6 rounded-lg overflow-hidden border border-[#176B67]/30 dark:border-[#C8F169]/40 shadow-xs shrink-0">
-            <img src="/app-logo.png" alt="BttM" className="w-full h-full object-cover" />
+          <div className="w-7 h-7 rounded-xl overflow-hidden border border-[#24C7DB]/30 shadow-xs shrink-0 bg-[#070E1A]">
+            <img src="/app-logo.png" alt="btmu" className="w-full h-full object-cover" />
           </div>
           <div className="flex flex-col">
-            <span className="font-mono font-black tracking-widest text-[11px] uppercase text-[#176B67] dark:text-[#C8F169]">
-              bttm <span className="lowercase font-normal tracking-normal text-[#777267] dark:text-[#92998F]">By</span> Ahmed Taboubi
+            <span className="font-display font-bold tracking-tight text-[13px] text-[#0A131F] dark:text-[#F0F4FA]">
+              btmu <span className="font-normal text-[11px] text-[#52657A] dark:text-[#7E8F9E]">by Ahmed</span>
             </span>
           </div>
         </div>
@@ -170,35 +181,35 @@ function MainLayout() {
           {/* Quick Add Audio Button */}
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="p-2 rounded-xl bg-[#E8DDC9] dark:bg-[#141815] hover:bg-[#C8F169]/30 dark:hover:bg-[#C8F169]/20 text-[#292820] dark:text-[#E8E9DD] border border-[#292820]/10 dark:border-white/10 transition active:scale-90"
+            className="p-2 rounded-xl bg-[#DFE8F2] dark:bg-[#0E1726] hover:bg-[#24C7DB]/20 text-[#0A131F] dark:text-[#F0F4FA] border border-[#0A131F]/10 dark:border-white/10 transition active:scale-90"
             title="Import audio file"
             aria-label="Import audio"
           >
-            <Plus className="w-4 h-4 text-[#176B67] dark:text-[#C8F169]" />
+            <Plus className="w-4 h-4 text-[#0E8B9C] dark:text-[#24C7DB]" />
           </button>
 
-          {/* Theme Toggle (Champagne Light / Cinematic Dark) */}
+          {/* Theme Toggle (Light / Dark) */}
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-xl bg-[#E8DDC9] dark:bg-[#141815] hover:bg-[#C8F169]/30 dark:hover:bg-[#C8F169]/20 text-[#292820] dark:text-[#E8E9DD] border border-[#292820]/10 dark:border-white/10 transition active:scale-90"
-            title={isDarkMode ? 'Switch to Warm Champagne Light' : 'Switch to Cinematic Dark'}
+            className="p-2 rounded-xl bg-[#DFE8F2] dark:bg-[#0E1726] hover:bg-[#24C7DB]/20 text-[#0A131F] dark:text-[#F0F4FA] border border-[#0A131F]/10 dark:border-white/10 transition active:scale-90"
+            title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             aria-label="Toggle theme"
           >
             {isDarkMode ? (
-              <Sun className="w-4 h-4 text-[#C8F169]" />
+              <Sun className="w-4 h-4 text-[#E5B842]" />
             ) : (
-              <Moon className="w-4 h-4 text-[#176B67]" />
+              <Moon className="w-4 h-4 text-[#0E8B9C]" />
             )}
           </button>
 
           {/* Settings Drawer Button */}
           <button
             onClick={() => setIsSettingsOpen(true)}
-            className="p-2 rounded-xl bg-[#E8DDC9] dark:bg-[#141815] hover:bg-[#C8F169]/30 dark:hover:bg-[#C8F169]/20 text-[#292820] dark:text-[#E8E9DD] border border-[#292820]/10 dark:border-white/10 transition active:scale-90"
-            title="Settings & Diagnostics"
+            className="p-2 rounded-xl bg-[#DFE8F2] dark:bg-[#0E1726] hover:bg-[#24C7DB]/20 text-[#0A131F] dark:text-[#F0F4FA] border border-[#0A131F]/10 dark:border-white/10 transition active:scale-90"
+            title="Settings & Preferences"
             aria-label="Settings"
           >
-            <SettingsIcon className="w-4 h-4 text-[#777267] dark:text-[#92998F]" />
+            <SettingsIcon className="w-4 h-4 text-[#52657A] dark:text-[#7E8F9E]" />
           </button>
         </div>
       </header>
@@ -263,16 +274,16 @@ function MainLayout() {
 
       {/* Liquid Glass Settings Screen Modal */}
       {isSettingsOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-[#F3EBDD] dark:bg-[#080A09] text-[#292820] dark:text-[#E8E9DD] animate-in fade-in slide-in-from-bottom-4 duration-200">
-          <div className="sticky top-0 z-30 pt-safe bg-[#E8DDC9]/90 dark:bg-[#141815]/90 backdrop-blur-3xl border-b border-[#292820]/10 dark:border-white/10 px-4 py-3 flex items-center justify-between">
+        <div className="fixed inset-0 z-50 flex flex-col bg-[#EEF3F8] dark:bg-[#070E1A] text-[#0A131F] dark:text-[#F0F4FA] animate-in fade-in slide-in-from-bottom-4 duration-200">
+          <div className="sticky top-0 z-30 pt-safe bg-[#DFE8F2]/90 dark:bg-[#0E1726]/90 backdrop-blur-3xl border-b border-[#0A131F]/10 dark:border-white/10 px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-black text-[#176B67] dark:text-[#C8F169] uppercase tracking-wider">
-                BttM Preferences
+              <span className="text-xs font-display font-bold text-[#0E8B9C] dark:text-[#24C7DB] uppercase tracking-wider">
+                btmu Preferences
               </span>
             </div>
             <button
               onClick={() => setIsSettingsOpen(false)}
-              className="p-2 rounded-full bg-[#E8DDC9] dark:bg-[#141815] border border-[#292820]/10 dark:border-white/10 text-[#292820] dark:text-[#E8E9DD] active:scale-90 transition"
+              className="p-2 rounded-full bg-[#DFE8F2] dark:bg-[#0E1726] border border-[#0A131F]/10 dark:border-white/10 text-[#0A131F] dark:text-[#F0F4FA] active:scale-90 transition"
               aria-label="Close Settings"
             >
               <X className="w-5 h-5" />

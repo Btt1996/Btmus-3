@@ -212,7 +212,7 @@ export const SpotDLInfoModal: React.FC<SpotDLInfoModalProps> = ({
                     </span>
                   </div>
                   <p className="text-[11px] text-zinc-500 leading-relaxed">
-                    Uses Telegram bot/cloud storage as an audio synchronizer. You can forward music files or bot links directly to your private bot or channel; Btt Music downloads and stores them offline in IndexedDB with 0 server costs.
+                    Uses Telegram bot/cloud storage as an audio synchronizer. You can forward music files or bot links directly to your private bot or channel; btmu downloads and stores them offline in IndexedDB with 0 server costs.
                   </p>
                 </div>
 

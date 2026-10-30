@@ -111,32 +111,32 @@ export const OnboardingView: React.FC<OnboardingViewProps> = ({ onGoToSync, onTr
 
       {/* Official App Logo Crest */}
       <div className="relative">
-        <div className="w-24 h-24 rounded-3xl overflow-hidden shadow-xl border-2 border-[#02ABB0]/40 bg-zinc-100 dark:bg-[#024E5B]/20 flex items-center justify-center">
+        <div className="w-24 h-24 rounded-3xl overflow-hidden shadow-xl border-2 border-[var(--btt-accent)]/40 bg-[var(--btt-surface)] flex items-center justify-center">
           <img
             src="/app-logo.png"
-            alt="Btt Music Official Logo"
+            alt="btmu Logo"
             className="w-full h-full object-cover"
           />
         </div>
-        <span className="absolute -bottom-1 -right-1 px-2.5 py-0.5 rounded-full bg-[#02ABB0] text-black text-[10px] font-extrabold shadow-md font-mono">
-          v1.5.0
+        <span className="absolute -bottom-1 -right-1 px-2.5 py-0.5 rounded-full bg-[var(--btt-accent)] text-black text-[10px] font-extrabold shadow-md font-mono">
+          v1.8.0
         </span>
       </div>
 
       <div>
         <div className="flex items-center justify-center gap-1.5 mb-1">
-          <span className="text-xs font-black tracking-widest uppercase text-[#02ABB0] font-serif">
-            BTT MUSIC
+          <span className="text-xs font-black tracking-widest uppercase text-[var(--btt-accent)] font-mono">
+            btmu by Ahmed
           </span>
           <span className="text-[10px] font-mono text-zinc-500 bg-zinc-200 dark:bg-zinc-800 px-1.5 py-0.2 rounded-md">
             iOS PWA
           </span>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-black dark:text-white tracking-tight font-serif">
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-black dark:text-white tracking-tight font-display">
           Personal Music Player for iPhone
         </h2>
-        <p className="mt-2 text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed font-serif">
-          Zero subscriptions, zero tracking. Real offline playback, background audio, Telegram sync, and Btt Smart Mix DJ crossfading.
+        <p className="mt-2 text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+          Zero subscriptions, zero tracking. Real offline playback, background audio, Telegram sync, and Smart Mix DJ crossfading.
         </p>
       </div>
 

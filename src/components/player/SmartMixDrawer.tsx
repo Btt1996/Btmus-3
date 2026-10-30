@@ -92,7 +92,7 @@ export const SmartMixDrawer: React.FC<SmartMixDrawerProps> = ({ isOpen, onClose,
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-black dark:text-white">Btt Smart Mix</h3>
+              <h3 className="text-base font-bold text-black dark:text-white font-display">Smart Mix</h3>
               <p className="text-[11px] text-zinc-500 dark:text-zinc-400">Intelligent song transitions & DJ flow</p>
             </div>
           </div>

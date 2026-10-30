@@ -1,12 +1,12 @@
 {
-  "name": "Btt Music",
-  "short_name": "BttM",
-  "description": "Personal offline music player for iPhone with Btt Smart Mix, Telegram sync, and lock-screen audio playback.",
+  "name": "btmu by Ahmed",
+  "short_name": "btmu",
+  "description": "Personal offline music player for iPhone with btmu identity, Telegram sync, and lock-screen audio playback.",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#080A09",
-  "theme_color": "#080A09",
+  "background_color": "#070E1A",
+  "theme_color": "#070E1A",
   "categories": ["music", "entertainment", "utilities"],
   "icons": [
     {

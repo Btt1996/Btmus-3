@@ -60,23 +60,23 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       {/* Header: Brand, Greeting & Status */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-12 h-12 rounded-2xl overflow-hidden shadow-md border border-[#176B67]/30 dark:border-[#C8F169]/30 bg-[#E8DDC9] dark:bg-[#141815] shrink-0">
+          <div className="w-12 h-12 rounded-2xl overflow-hidden shadow-md border border-[var(--btt-accent)]/30 bg-[var(--btt-surface)] shrink-0">
             <img
               src="/app-logo.png"
-              alt="BttM Logo"
+              alt="btmu Logo"
               className="w-full h-full object-cover"
             />
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              <span className="text-[11px] font-black tracking-widest uppercase text-[#176B67] dark:text-[#C8F169] font-mono">
-                bttm By Ahmed Taboubi
+              <span className="text-[11px] font-black tracking-widest uppercase text-[var(--btt-accent)] font-mono">
+                btmu by Ahmed
               </span>
-              <span className="px-1.5 py-0.5 rounded-full bg-[#176B67]/15 dark:bg-[#C8F169]/15 text-[9px] font-bold text-[#176B67] dark:text-[#C8F169]">
+              <span className="px-1.5 py-0.5 rounded-full bg-[var(--btt-accent)]/15 text-[9px] font-bold text-[var(--btt-accent)]">
                 Offline
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-[#292820] dark:text-[#E8E9DD] tracking-tight mt-0.5 truncate font-sans">
+            <h1 className="text-2xl sm:text-3xl font-black text-[var(--btt-card-text)] tracking-tight mt-0.5 truncate font-display">
               {getGreeting()}
             </h1>
           </div>
@@ -139,8 +139,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-black text-[#292820] dark:text-[#E8E9DD] tracking-wide">
-                  BTT SMART MIX
+                <span className="text-xs font-black text-[var(--btt-card-text)] tracking-wide">
+                  SMART MIX
                 </span>
                 <span
                   className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${

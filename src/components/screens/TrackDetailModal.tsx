@@ -30,9 +30,9 @@ export const TrackDetailModal: React.FC<TrackDetailModalProps> = ({
         {/* Top Header */}
         <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center gap-2">
-            <h3 className="text-base font-bold text-black dark:text-white">Song Information</h3>
+            <h3 className="text-base font-bold text-black dark:text-white font-display">Song Information</h3>
             <span className="px-2 py-0.5 rounded-full bg-zinc-200 dark:bg-zinc-800 text-black dark:text-white text-[10px] font-bold">
-              Btt Music
+              btmu
             </span>
           </div>
           <button
@@ -49,7 +49,7 @@ export const TrackDetailModal: React.FC<TrackDetailModalProps> = ({
             {track.artworkUrl ? (
               <img src={track.artworkUrl} alt={track.title} className="w-full h-full object-cover" />
             ) : (
-              <img src="/app-logo.png" alt="Btt Music" className="w-full h-full object-cover" />
+              <img src="/app-logo.png" alt="btmu" className="w-full h-full object-cover" />
             )}
           </div>
           <div className="min-w-0 flex-1">
@@ -64,7 +64,7 @@ export const TrackDetailModal: React.FC<TrackDetailModalProps> = ({
           <div className="mb-3 p-3 rounded-2xl bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-black dark:text-white flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5" /> Btt Smart Mix Acoustic Profile
+                <Sparkles className="w-3.5 h-3.5" /> Smart Mix Acoustic Profile
               </span>
               <span className="px-2 py-0.5 rounded-full bg-zinc-200 dark:bg-zinc-800 text-black dark:text-white font-mono text-[10px] font-bold">
                 Camelot {analysis.camelot}

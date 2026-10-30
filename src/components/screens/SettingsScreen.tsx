@@ -18,6 +18,7 @@ import {
   Server,
   BarChart3,
   Database,
+  Palette,
 } from 'lucide-react';
 import { useMusic } from '../../context/MusicContext';
 import { formatFileSize } from '../../utils/id3Parser';
@@ -99,7 +100,7 @@ export const SettingsScreen: React.FC = () => {
     try {
       const json = await exportLibraryBackup(withAudio);
       const blob = new Blob([json], { type: 'application/json' });
-      const filename = `btt-music-${withAudio ? 'vault' : 'db'}-${new Date().toISOString().slice(0, 10)}.json`;
+      const filename = `btmu-${withAudio ? 'vault' : 'db'}-${new Date().toISOString().slice(0, 10)}.json`;
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -216,34 +217,34 @@ export const SettingsScreen: React.FC = () => {
 
       {/* Screen Title */}
       <div>
-        <div className="text-[10px] uppercase tracking-widest text-[#176B67] dark:text-[#C8F169] font-black font-mono">
-          bttm By Ahmed Taboubi
+        <div className="text-[10px] uppercase tracking-widest text-[var(--btt-accent)] font-black font-mono">
+          btmu by Ahmed
         </div>
-        <h1 className="text-3xl font-extrabold text-[#292820] dark:text-[#E8E9DD] tracking-tight font-sans">Settings</h1>
-        <p className="text-xs text-[#777267] dark:text-[#92998F] mt-1 font-sans">
-          Btt Music preferences, updates, audio transitions, and offline storage.
+        <h1 className="text-3xl font-extrabold text-[var(--btt-card-text)] tracking-tight font-display">Settings</h1>
+        <p className="text-xs text-[var(--btt-card-subtext)] mt-1 font-sans">
+          btmu preferences, updates, audio transitions, palette themes, and offline storage.
         </p>
       </div>
 
       {/* SECTION 1: CHECK FOR UPDATES */}
       <section className="space-y-3">
-        <h3 className="text-xs font-mono font-black uppercase tracking-wider text-[#176B67] dark:text-[#C8F169] flex items-center gap-1.5">
-          <ArrowUpCircle className="w-4 h-4 text-[#176B67] dark:text-[#C8F169]" /> Application Updates
+        <h3 className="text-xs font-mono font-black uppercase tracking-wider text-[var(--btt-accent)] flex items-center gap-1.5">
+          <ArrowUpCircle className="w-4 h-4 text-[var(--btt-accent)]" /> Application Updates
         </h3>
 
-        <div className="p-5 rounded-3xl bg-[#E8DDC9]/70 dark:bg-[#141815]/80 backdrop-blur-2xl border border-[#292820]/10 dark:border-white/10 space-y-4 shadow-sm">
+        <div className="p-5 rounded-3xl bg-[var(--btt-surface)] backdrop-blur-2xl border border-[var(--btt-border)] space-y-4 shadow-sm">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-13 h-13 rounded-2xl overflow-hidden shadow-sm border border-[#176B67]/30 dark:border-[#C8F169]/40 bg-[#E8DDC9] dark:bg-[#141815] shrink-0">
+              <div className="w-13 h-13 rounded-2xl overflow-hidden shadow-sm border border-[var(--btt-accent)]/30 bg-[var(--btt-surface)] shrink-0">
                 <img
                   src="/app-logo.png"
-                  alt="BttM Logo"
+                  alt="btmu Logo"
                   className="w-full h-full object-cover"
                 />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-[#292820] dark:text-[#E8E9DD] font-sans">bttm By Ahmed Taboubi</h4>
-                <p className="text-xs text-[#777267] dark:text-[#92998F] font-mono mt-0.5">
+                <h4 className="text-sm font-bold text-[var(--btt-card-text)] font-display">btmu by Ahmed</h4>
+                <p className="text-xs text-[var(--btt-card-subtext)] font-mono mt-0.5">
                   Version {currentVersion} • iOS Edition
                 </p>
               </div>
@@ -252,7 +253,7 @@ export const SettingsScreen: React.FC = () => {
             <button
               onClick={checkForUpdates}
               disabled={updateStatus === 'checking'}
-              className="px-3.5 py-2 rounded-xl bg-[#176B67]/15 dark:bg-[#C8F169]/15 hover:bg-[#176B67]/25 dark:hover:bg-[#C8F169]/25 border border-[#176B67]/20 dark:border-[#C8F169]/30 disabled:opacity-50 text-xs font-bold text-[#176B67] dark:text-[#C8F169] flex items-center gap-1.5 transition active:scale-95 shrink-0"
+              className="px-3.5 py-2 rounded-xl bg-[var(--btt-accent)]/15 hover:bg-[var(--btt-accent)]/25 border border-[var(--btt-accent)]/25 disabled:opacity-50 text-xs font-bold text-[var(--btt-accent)] flex items-center gap-1.5 transition active:scale-95 shrink-0"
             >
               {updateStatus === 'checking' ? (
                 <>
@@ -270,29 +271,29 @@ export const SettingsScreen: React.FC = () => {
 
           {/* Update Status Banner */}
           {updateStatus === 'latest' && (
-            <div className="p-3 rounded-2xl bg-[#C8F169]/15 dark:bg-[#C8F169]/10 border border-[#176B67]/20 dark:border-[#C8F169]/30 flex items-center gap-2.5 text-xs text-[#176B67] dark:text-[#C8F169] font-medium">
-              <CheckCircle2 className="w-4 h-4 shrink-0 text-[#176B67] dark:text-[#C8F169]" />
-              <span>You are using the latest version of Btt Music (v{currentVersion}).</span>
+            <div className="p-3 rounded-2xl bg-[var(--btt-accent)]/15 border border-[var(--btt-accent)]/30 flex items-center gap-2.5 text-xs text-[var(--btt-card-text)] font-medium">
+              <CheckCircle2 className="w-4 h-4 shrink-0 text-[var(--btt-accent)]" />
+              <span>You are using the latest version of btmu (v{currentVersion}).</span>
             </div>
           )}
 
           {updateStatus === 'available' && (
-            <div className="p-4 rounded-2xl bg-[#C8F169]/20 dark:bg-[#C8F169]/15 border border-[#C8F169]/40 space-y-2.5 text-xs">
+            <div className="p-4 rounded-2xl bg-[var(--btt-accent)]/20 border border-[var(--btt-accent)]/40 space-y-2.5 text-xs">
               <div className="flex items-center justify-between">
-                <span className="font-bold text-[#292820] dark:text-[#E8E9DD] flex items-center gap-1.5">
-                  <ArrowUpCircle className="w-4 h-4 text-[#176B67] dark:text-[#C8F169]" />
+                <span className="font-bold text-[var(--btt-card-text)] flex items-center gap-1.5">
+                  <ArrowUpCircle className="w-4 h-4 text-[var(--btt-accent)]" />
                   Update Available: v{remoteVersion}
                 </span>
-                <span className="text-[10px] text-[#777267] dark:text-[#92998F]">Ready to install</span>
+                <span className="text-[10px] text-[var(--btt-card-subtext)]">Ready to install</span>
               </div>
               {releaseNotes && (
-                <p className="text-[11px] text-[#292820] dark:text-[#E8E9DD] leading-relaxed bg-[#F3EBDD]/70 dark:bg-[#080A09]/70 p-2.5 rounded-xl border border-[#292820]/10 dark:border-white/10">
+                <p className="text-[11px] text-[var(--btt-card-text)] leading-relaxed bg-[var(--btt-bg)]/80 p-2.5 rounded-xl border border-[var(--btt-border)]">
                   {releaseNotes}
                 </p>
               )}
               <button
                 onClick={applyUpdate}
-                className="w-full py-2.5 px-4 rounded-xl bg-[#176B67] text-[#F3EBDD] dark:bg-[#C8F169] dark:text-[#080A09] font-bold text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1.5"
+                className="w-full py-2.5 px-4 rounded-xl bg-[var(--btt-accent)] text-black font-bold text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1.5"
               >
                 <ArrowUpCircle className="w-4 h-4" />
                 Update Now (Preserves all music)
@@ -301,51 +302,155 @@ export const SettingsScreen: React.FC = () => {
           )}
 
           {updateStatus === 'offline' && (
-            <div className="p-3 rounded-2xl bg-[#E8DDC9] dark:bg-[#141815] text-xs text-[#777267] dark:text-[#92998F] flex items-center gap-2 border border-[#292820]/10 dark:border-white/10">
+            <div className="p-3 rounded-2xl bg-[var(--btt-surface)] text-xs text-[var(--btt-card-subtext)] flex items-center gap-2 border border-[var(--btt-border)]">
               <Clock className="w-4 h-4 shrink-0" />
               <span>Device is currently offline. Connect to internet to verify updates.</span>
             </div>
           )}
 
           {lastCheckedAt && (
-            <p className="text-[10px] text-[#777267] dark:text-[#92998F] text-right font-mono">
+            <p className="text-[10px] text-[var(--btt-card-subtext)] text-right font-mono">
               Last checked: {new Date(lastCheckedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </p>
           )}
         </div>
       </section>
 
-      {/* SECTION 2: VOLUME BOOSTER & LOCK SCREEN */}
+      {/* SECTION: PALETTE COMBOS */}
       <section className="space-y-3">
-        <h3 className="text-xs font-mono font-black uppercase tracking-wider text-[#176B67] dark:text-[#C8F169] flex items-center gap-1.5">
-          <Zap className="w-4 h-4 text-[#176B67] dark:text-[#C8F169]" /> Volume & Lock Screen Controls
+        <h3 className="text-xs font-mono font-black uppercase tracking-wider text-[var(--btt-accent)] flex items-center gap-1.5">
+          <Palette className="w-4 h-4 text-[var(--btt-accent)]" /> Palette Combos
         </h3>
 
-        <div className="p-5 rounded-3xl bg-[#E8DDC9]/70 dark:bg-[#141815]/80 backdrop-blur-2xl border border-[#292820]/10 dark:border-white/10 space-y-4 shadow-sm">
+        <div className="p-5 rounded-3xl bg-[var(--btt-surface)] backdrop-blur-2xl border border-[var(--btt-border)] space-y-3.5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-[var(--btt-card-subtext)]">
+              Select your active color palette:
+            </span>
+            <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-[var(--btt-accent)]/15 text-[var(--btt-accent)] font-bold">
+              {settings.paletteCombo || 'signature'}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 gap-2.5">
+            {/* Signature Palette */}
+            <button
+              type="button"
+              onClick={async () => {
+                document.documentElement.setAttribute('data-palette', 'signature');
+                await updateSettings({ paletteCombo: 'signature' });
+                showToast('Palette switched to Signature (Navy/Gold/Cyan)');
+              }}
+              className={`p-3.5 rounded-2xl border text-left transition flex items-center justify-between ${
+                (settings.paletteCombo || 'signature') === 'signature'
+                  ? 'border-[var(--btt-accent)] bg-[var(--btt-accent)]/10 ring-1 ring-[var(--btt-accent)]'
+                  : 'border-[var(--btt-border)] hover:border-[var(--btt-card-subtext)]/40 bg-[var(--btt-bg)]/40'
+              }`}
+            >
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-xs text-[var(--btt-card-text)] font-display">Signature</span>
+                  <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[var(--btt-accent)]/20 text-[var(--btt-accent)] font-semibold">DEFAULT</span>
+                </div>
+                <p className="text-[11px] text-[var(--btt-card-subtext)] leading-snug">
+                  Signature Navy (#070E1A) with Gold (#D4AF37) accents and Cyan (#00E5FF) highlights.
+                </p>
+              </div>
+              <div className="flex items-center gap-1 shrink-0 ml-3">
+                <span className="w-4 h-4 rounded-full bg-[#070E1A] border border-white/20" />
+                <span className="w-4 h-4 rounded-full bg-[#D4AF37]" />
+                <span className="w-4 h-4 rounded-full bg-[#00E5FF]" />
+              </div>
+            </button>
+
+            {/* Mono Palette */}
+            <button
+              type="button"
+              onClick={async () => {
+                document.documentElement.setAttribute('data-palette', 'mono');
+                await updateSettings({ paletteCombo: 'mono' });
+                showToast('Palette switched to Mono (Pure Black & White)');
+              }}
+              className={`p-3.5 rounded-2xl border text-left transition flex items-center justify-between ${
+                settings.paletteCombo === 'mono'
+                  ? 'border-[var(--btt-accent)] bg-[var(--btt-accent)]/10 ring-1 ring-[var(--btt-accent)]'
+                  : 'border-[var(--btt-border)] hover:border-[var(--btt-card-subtext)]/40 bg-[var(--btt-bg)]/40'
+              }`}
+            >
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-xs text-[var(--btt-card-text)] font-display">Mono</span>
+                </div>
+                <p className="text-[11px] text-[var(--btt-card-subtext)] leading-snug">
+                  Pure black (#000000), crisp white (#FFFFFF), and silver (#E5E7EB) high-contrast minimalist.
+                </p>
+              </div>
+              <div className="flex items-center gap-1 shrink-0 ml-3">
+                <span className="w-4 h-4 rounded-full bg-black border border-white/30" />
+                <span className="w-4 h-4 rounded-full bg-white border border-black/30" />
+                <span className="w-4 h-4 rounded-full bg-neutral-400" />
+              </div>
+            </button>
+
+            {/* Legacy Palette */}
+            <button
+              type="button"
+              onClick={async () => {
+                document.documentElement.setAttribute('data-palette', 'legacy');
+                await updateSettings({ paletteCombo: 'legacy' });
+                showToast('Palette switched to Legacy (Sand/Forest/Chartreuse)');
+              }}
+              className={`p-3.5 rounded-2xl border text-left transition flex items-center justify-between ${
+                settings.paletteCombo === 'legacy'
+                  ? 'border-[var(--btt-accent)] bg-[var(--btt-accent)]/10 ring-1 ring-[var(--btt-accent)]'
+                  : 'border-[var(--btt-border)] hover:border-[var(--btt-card-subtext)]/40 bg-[var(--btt-bg)]/40'
+              }`}
+            >
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-xs text-[var(--btt-card-text)] font-display">Legacy</span>
+                  <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-neutral-500/20 text-[var(--btt-card-subtext)] font-semibold">v1.7</span>
+                </div>
+                <p className="text-[11px] text-[var(--btt-card-subtext)] leading-snug">
+                  v1.7 champagne/sand (#F3EBDD), deep forest (#176B67), and chartreuse (#C8F169).
+                </p>
+              </div>
+              <div className="flex items-center gap-1 shrink-0 ml-3">
+                <span className="w-4 h-4 rounded-full bg-[#176B67]" />
+                <span className="w-4 h-4 rounded-full bg-[#C8F169]" />
+                <span className="w-4 h-4 rounded-full bg-[#F3EBDD] border border-black/20" />
+              </div>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 2: VOLUME BOOSTER & LOCK SCREEN */}
+      <section className="space-y-3">
+        <h3 className="text-xs font-mono font-black uppercase tracking-wider text-[var(--btt-accent)] flex items-center gap-1.5">
+          <Zap className="w-4 h-4 text-[var(--btt-accent)]" /> Volume & Lock Screen Controls
+        </h3>
+
+        <div className="p-5 rounded-3xl bg-[var(--btt-surface)] backdrop-blur-2xl border border-[var(--btt-border)] space-y-4 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <span className="text-sm font-bold text-[#292820] dark:text-[#E8E9DD] flex items-center gap-1.5">
+              <span className="text-sm font-bold text-[var(--btt-card-text)] flex items-center gap-1.5">
                 3x Audio Booster
-                {playerState.isBoosterActive && (
-                  <span className="px-2 py-0.5 rounded-full bg-[#176B67] text-[#F3EBDD] dark:bg-[#C8F169] dark:text-[#080A09] text-[10px] font-mono font-bold">
-                    {playerState.volumeBooster.toFixed(1)}x Active
-                  </span>
-                )}
+                <span className="px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-500 text-[10px] font-mono font-bold">
+                  Disabled
+                </span>
               </span>
-              <p className="text-xs text-[#777267] dark:text-[#92998F] mt-0.5">
-                Gain amplification with peak limiter
+              <p className="text-xs text-[var(--btt-card-subtext)] mt-0.5">
+                Disabled for background stability on iOS
               </p>
             </div>
             <button
               onClick={() => toggleVolumeBooster()}
-              className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition flex items-center gap-1.5 ${
-                playerState.isBoosterActive
-                  ? 'bg-[#176B67] text-[#F3EBDD] dark:bg-[#C8F169] dark:text-[#080A09] shadow-sm'
-                  : 'bg-[#E8DDC9] dark:bg-[#141815] text-[#777267] dark:text-[#92998F] hover:text-[#292820] dark:hover:text-[#E8E9DD] border border-[#292820]/10 dark:border-white/10'
-              }`}
+              className="px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition flex items-center gap-1.5 opacity-60 cursor-not-allowed bg-[var(--btt-surface)] text-[var(--btt-card-subtext)] border border-[var(--btt-border)]"
+              title="Volume booster is disabled to ensure continuous background playback on iOS"
             >
-              <Zap className="w-3.5 h-3.5 fill-current" />
-              <span>{playerState.isBoosterActive ? 'Enabled' : 'Disabled'}</span>
+              <Zap className="w-3.5 h-3.5" />
+              <span>Disabled</span>
             </button>
           </div>
 
@@ -353,27 +458,27 @@ export const SettingsScreen: React.FC = () => {
             <VolumeControl showPresets={true} />
           </div>
 
-          <div className="pt-2 border-t border-[#292820]/10 dark:border-white/10 space-y-1.5 text-xs text-[#777267] dark:text-[#92998F]">
+          <div className="pt-2 border-t border-[var(--btt-border)] space-y-1.5 text-xs text-[var(--btt-card-subtext)]">
             <div className="flex items-start gap-2">
-              <span className="text-[#176B67] dark:text-[#C8F169] font-bold">📱</span>
+              <span className="text-[var(--btt-accent)] font-bold">📱</span>
               <span>
-                <strong className="text-[#292820] dark:text-[#E8E9DD]">AirPods & Lock Screen:</strong> Supports 10s seeking via triple-press and Next (⏭) / Previous (⏮) skipping.
+                <strong className="text-[var(--btt-card-text)]">AirPods & Lock Screen:</strong> Native iOS lock screen controls with track skip (⏮/⏭), seek, and continuous background audio.
               </span>
             </div>
             <div className="flex items-start gap-2">
-              <span className="text-[#176B67] dark:text-[#C8F169] font-bold">🎵</span>
+              <span className="text-[var(--btt-accent)] font-bold">🎵</span>
               <span>
-                <strong className="text-[#292820] dark:text-[#E8E9DD]">Background Audio:</strong> Plays continuously with screen locked or app backgrounded via native iOS playback.
+                <strong className="text-[var(--btt-card-text)]">Direct CoreAudio Output:</strong> Web Audio gain routing removed to guarantee uninterrupted playback when phone is locked or backgrounded.
               </span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* SECTION 3: BTT SMART MIX */}
+      {/* SECTION 3: SMART MIX */}
       <section className="space-y-3">
-        <h3 className="text-xs font-mono font-black uppercase tracking-wider text-[#176B67] dark:text-[#C8F169] flex items-center gap-1.5">
-          <Sparkles className="w-4 h-4 text-[#176B67] dark:text-[#C8F169]" /> Btt Smart Mix & Transitions
+        <h3 className="text-xs font-mono font-black uppercase tracking-wider text-[var(--btt-accent)] flex items-center gap-1.5">
+          <Sparkles className="w-4 h-4 text-[var(--btt-accent)]" /> Smart Mix & Transitions
         </h3>
 
         <div className="p-5 rounded-3xl bg-[#E8DDC9]/70 dark:bg-[#141815]/80 backdrop-blur-2xl border border-[#292820]/10 dark:border-white/10 space-y-4 shadow-sm">
@@ -688,7 +793,7 @@ export const SettingsScreen: React.FC = () => {
 
       {/* Footer Branding */}
       <div className="text-center pt-2 pb-6 text-[11px] text-[#777267] dark:text-[#92998F] space-y-1">
-        <p className="font-bold text-[#176B67] dark:text-[#C8F169] font-mono">bttm By Ahmed Taboubi</p>
+        <p className="font-bold text-[var(--btt-accent)] font-mono">btmu by Ahmed</p>
         <p>{APP_NAME} v{APP_VERSION} • iOS Edition • Built {BUILD_DATE}</p>
       </div>
 

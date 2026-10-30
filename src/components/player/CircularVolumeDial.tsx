@@ -202,6 +202,7 @@ export const CircularVolumeDial: React.FC<CircularVolumeDialProps> = ({ classNam
                   </div>
 
                   {/* LOWER SECTION: 3X AUDIO BOOSTER STAGE */}
+                  {/* LOWER SECTION: AUDIO BOOSTER STAGE (Disabled for background stability) */}
                   <div className="p-3 rounded-2xl bg-[#E8DDC9]/70 dark:bg-[#080A09]/60 border border-[#292820]/10 dark:border-white/10 space-y-2.5">
                     <div className="flex items-center justify-between">
                       <div>
@@ -209,82 +210,25 @@ export const CircularVolumeDial: React.FC<CircularVolumeDialProps> = ({ classNam
                           <Zap className="w-4 h-4 text-[#176B67] dark:text-[#62D8C8]" />
                           <span>Hardware Booster</span>
                         </div>
-                        <span className="text-[10px] text-[#777267] dark:text-[#92998F]">
-                          Web Audio studio compressor prevents clipping
+                        <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
+                          Disabled for background playback stability
                         </span>
                       </div>
 
                       <button
                         type="button"
                         onClick={() => toggleVolumeBooster()}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition flex items-center gap-1.5 active:scale-95 ${
-                          isBoosterActive
-                            ? 'bg-[#176B67] text-[#E8DDC9] dark:bg-[#C8F169] dark:text-[#080A09] shadow-sm'
-                            : 'bg-[#292820]/10 dark:bg-white/10 text-[#777267] dark:text-[#92998F]'
-                        }`}
+                        className="px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition flex items-center gap-1.5 opacity-60 cursor-not-allowed bg-[#292820]/10 dark:bg-white/10 text-[#777267] dark:text-[#92998F]"
+                        title="Disabled for background stability"
                       >
-                        <Zap className="w-3.5 h-3.5 fill-current" />
-                        <span>{isBoosterActive ? 'Active' : 'Off'}</span>
+                        <Zap className="w-3.5 h-3.5" />
+                        <span>Off</span>
                       </button>
                     </div>
 
-                    {/* Booster Intensity Slider */}
-                    {isBoosterActive && (
-                      <div className="space-y-1 pt-1 animate-in fade-in duration-200">
-                        <div className="flex justify-between items-center text-[11px] font-mono">
-                          <span className="text-[#777267] dark:text-[#92998F]">Booster Multiplier:</span>
-                          <span className="font-bold text-[#176B67] dark:text-[#62D8C8]">
-                            {volumeBooster.toFixed(1)}x
-                          </span>
-                        </div>
-                        <input
-                          type="range"
-                          min={1.0}
-                          max={3.0}
-                          step={0.1}
-                          value={volumeBooster}
-                          onMouseDown={() => setIsDraggingSlider(true)}
-                          onTouchStart={() => setIsDraggingSlider(true)}
-                          onMouseUp={() => setIsDraggingSlider(false)}
-                          onTouchEnd={() => setIsDraggingSlider(false)}
-                          onChange={(e) => setVolumeBooster(Number(e.target.value))}
-                          className="w-full h-3 rounded-full appearance-none cursor-pointer bg-[#292820]/15 dark:bg-white/15 accent-[#62D8C8]"
-                        />
-                      </div>
-                    )}
-
-                    {/* Quick Presets */}
-                    <div className="flex items-center justify-between gap-1.5 pt-1">
-                      {[1.0, 1.5, 2.0, 3.0].map((preset) => {
-                        const isActive =
-                          preset === 1.0
-                            ? !isBoosterActive || volumeBooster <= 1.05
-                            : isBoosterActive && Math.abs(volumeBooster - preset) < 0.1;
-                        return (
-                          <button
-                            key={preset}
-                            type="button"
-                            onClick={() => {
-                              if (preset === 1.0) {
-                                setVolume(1.0);
-                                setVolumeBooster(1.0);
-                              } else {
-                                setVolume(1.0);
-                                setVolumeBooster(preset);
-                                if (!isBoosterActive) toggleVolumeBooster(true);
-                              }
-                            }}
-                            className={`flex-1 py-1.5 rounded-xl text-[10.5px] font-mono font-bold transition active:scale-95 ${
-                              isActive
-                                ? 'bg-[#176B67] text-[#E8DDC9] dark:bg-[#C8F169] dark:text-[#080A09] shadow-sm'
-                                : 'bg-[#292820]/10 dark:bg-white/10 text-[#777267] dark:text-[#92998F] hover:text-[#292820] dark:hover:text-[#E8E9DD]'
-                            }`}
-                          >
-                            {preset === 3.0 ? '3.0x MAX' : `${preset.toFixed(1)}x`}
-                          </button>
-                        );
-                      })}
-                    </div>
+                    <p className="text-[10.5px] text-[#777267] dark:text-[#92998F] leading-snug">
+                      Web Audio gain node bypassed. Direct CoreAudio / AVPlayer output ensures zero drops when app is locked or in background.
+                    </p>
                   </div>
 
                   {/* Collapse / Done Button */}

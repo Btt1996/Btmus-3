@@ -24,7 +24,75 @@
     --sar: env(safe-area-inset-right, 0px);
     color-scheme: light dark;
 
-    /* Light Theme (Warm Champagne & Chartreuse) */
+    /* Signature Light Theme (Default) */
+    --btt-bg: #EEF3F8;
+    --btt-elevated: #DFE8F2;
+    --btt-accent: #C99414;
+    --btt-secondary: #0E8B9C;
+    --btt-text: #0A131F;
+    --btt-muted: #52657A;
+    --btt-border: rgba(14, 139, 156, 0.16);
+  }
+
+  .dark,
+  :root.dark,
+  html.dark {
+    /* Signature Dark Theme (Default) */
+    --btt-bg: #070E1A;
+    --btt-elevated: #0E1726;
+    --btt-accent: #E5B842;
+    --btt-secondary: #24C7DB;
+    --btt-text: #F0F4FA;
+    --btt-muted: #7E8F9E;
+    --btt-border: rgba(36, 199, 219, 0.18);
+  }
+
+  /* 1. SIGNATURE COMBO (Deep Navy, Gold Primary, Cyan Accent) */
+  html[data-palette="signature"] {
+    --btt-bg: #EEF3F8;
+    --btt-elevated: #DFE8F2;
+    --btt-accent: #C99414;
+    --btt-secondary: #0E8B9C;
+    --btt-text: #0A131F;
+    --btt-muted: #52657A;
+    --btt-border: rgba(14, 139, 156, 0.16);
+  }
+
+  html[data-palette="signature"].dark,
+  html[data-palette="signature"] .dark {
+    --btt-bg: #070E1A;
+    --btt-elevated: #0E1726;
+    --btt-accent: #E5B842;
+    --btt-secondary: #24C7DB;
+    --btt-text: #F0F4FA;
+    --btt-muted: #7E8F9E;
+    --btt-border: rgba(36, 199, 219, 0.18);
+  }
+
+  /* 2. MONO COMBO (Pure Black & White) */
+  html[data-palette="mono"] {
+    --btt-bg: #FFFFFF;
+    --btt-elevated: #F4F4F5;
+    --btt-accent: #000000;
+    --btt-secondary: #27272A;
+    --btt-text: #000000;
+    --btt-muted: #71717A;
+    --btt-border: rgba(0, 0, 0, 0.14);
+  }
+
+  html[data-palette="mono"].dark,
+  html[data-palette="mono"] .dark {
+    --btt-bg: #000000;
+    --btt-elevated: #121212;
+    --btt-accent: #FFFFFF;
+    --btt-secondary: #E4E4E7;
+    --btt-text: #FFFFFF;
+    --btt-muted: #888888;
+    --btt-border: rgba(255, 255, 255, 0.16);
+  }
+
+  /* 3. LEGACY COMBO (Warm Champagne & Chartreuse) */
+  html[data-palette="legacy"] {
     --btt-bg: #F3EBDD;
     --btt-elevated: #E8DDC9;
     --btt-accent: #C8F169;
@@ -34,8 +102,8 @@
     --btt-border: rgba(23, 107, 103, 0.12);
   }
 
-  .dark {
-    /* Dark Theme (Cinematic Near-Black & Turquoise) */
+  html[data-palette="legacy"].dark,
+  html[data-palette="legacy"] .dark {
     --btt-bg: #080A09;
     --btt-elevated: #141815;
     --btt-accent: #C8F169;
@@ -246,4 +314,22 @@
   transform: scale(0.92);
   transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+/* Typography Enhancements (Item 5) */
+.font-display {
+  font-family: 'Sora', -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro", system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Hardware-accelerated Smooth Transitions (Item 6) */
+.smooth-motion {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
 

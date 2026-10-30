@@ -88,6 +88,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   smartMix: DEFAULT_SMART_MIX,
   volumeBooster: 1.0,
   isBoosterActive: false,
+  paletteCombo: 'signature',
 };
 
 export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -378,7 +379,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     navigator.mediaSession.metadata = new MediaMetadata({
       title: track.title,
       artist: track.artist || 'Unknown Artist',
-      album: track.album || 'Btt Music',
+      album: track.album || 'btmu by Ahmed',
       artwork,
     });
 
@@ -418,6 +419,18 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       navigator.mediaSession.setActionHandler('nexttrack', () => {
         nextTrackRef.current();
       });
+    } catch {
+      // ignore
+    }
+
+    // Explicitly set seekbackward and seekforward to null so iOS Lock Screen shows Track Skip (⏮ / ⏭), not ±10s
+    try {
+      navigator.mediaSession.setActionHandler('seekbackward', null);
+    } catch {
+      // ignore
+    }
+    try {
+      navigator.mediaSession.setActionHandler('seekforward', null);
     } catch {
       // ignore
     }
@@ -1135,42 +1148,27 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [applyMasterGain, ensureWebAudio]);
 
   const setVolumeBooster = useCallback(
-    (multiplier: number) => {
-      const clamped = Math.max(1.0, Math.min(3.0, multiplier));
-      const isActive = clamped > 1.0;
-
-      ensureWebAudio();
-      applyMasterGain(undefined, clamped, isActive);
-
+    (_multiplier: number) => {
       setPlayerState((prev) => ({
         ...prev,
-        volumeBooster: clamped,
-        isBoosterActive: isActive,
+        volumeBooster: 1.0,
+        isBoosterActive: false,
       }));
-
-      db.saveSetting('app_volume_booster', clamped);
-      db.saveSetting('app_is_booster_active', isActive);
-      showToast(isActive ? `Volume Boost: ${clamped.toFixed(1)}x` : 'Volume: 1.0x (Standard)');
+      showToast('Volume booster disabled for background stability');
     },
-    [applyMasterGain, ensureWebAudio, showToast]
+    [showToast]
   );
 
   const toggleVolumeBooster = useCallback(
-    (enabled?: boolean) => {
-      setPlayerState((prev) => {
-        const nextActive = enabled !== undefined ? enabled : !prev.isBoosterActive;
-        const targetMultiplier = nextActive ? (prev.volumeBooster > 1.0 ? prev.volumeBooster : 2.0) : 1.0;
-
-        ensureWebAudio();
-        applyMasterGain(undefined, targetMultiplier, nextActive);
-
-        db.saveSetting('app_is_booster_active', nextActive);
-        db.saveSetting('app_volume_booster', targetMultiplier);
-        showToast(nextActive ? `Volume Boost ON (${targetMultiplier.toFixed(1)}x)` : 'Volume Boost OFF (1.0x)');
-        return { ...prev, isBoosterActive: nextActive, volumeBooster: targetMultiplier };
-      });
+    (_enabled?: boolean) => {
+      setPlayerState((prev) => ({
+        ...prev,
+        volumeBooster: 1.0,
+        isBoosterActive: false,
+      }));
+      showToast('Volume booster disabled for background stability');
     },
-    [applyMasterGain, ensureWebAudio, showToast]
+    [showToast]
   );
 
   // Favorites

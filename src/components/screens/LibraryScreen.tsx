@@ -153,10 +153,10 @@ export const LibraryScreen: React.FC = () => {
       {/* Header with Title and Storage */}
       <div className="flex items-center justify-between">
         <div>
-          <div className="text-[10px] uppercase font-mono font-black text-[#176B67] dark:text-[#C8F169] tracking-wider">
-            BttM Library
+          <div className="text-[10px] uppercase font-mono font-black text-[var(--btt-accent)] tracking-wider">
+            btmu Library
           </div>
-          <h1 className="text-2xl font-black text-[#292820] dark:text-[#E8E9DD] tracking-tight">Music Library</h1>
+          <h1 className="text-2xl font-black text-[var(--btt-card-text)] tracking-tight font-display">Music Library</h1>
           <p className="text-xs text-[#777267] dark:text-[#92998F] mt-0.5 flex items-center gap-2">
             <span>{tracks.length} songs</span>
             <span>•</span>

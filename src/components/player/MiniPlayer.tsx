@@ -63,7 +63,7 @@ export const MiniPlayer: React.FC = () => {
           ) : (
             <img
               src="/app-logo.png"
-              alt="BttM"
+              alt="btmu"
               className="w-full h-full object-cover"
             />
           )}
